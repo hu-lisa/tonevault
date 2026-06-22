@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey, index } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: integer()
@@ -38,7 +38,9 @@ export const gearItems = pgTable("gear_items", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index().on(table.userId),
+]);
 export type GearItem = typeof gearItems.$inferSelect;
 export type NewGearItem = typeof gearItems.$inferInsert;
 
@@ -61,7 +63,9 @@ export const loadouts = pgTable("loadouts", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index().on(table.userId),
+]);
 export type Loadout = typeof loadouts.$inferSelect;
 export type NewLoadout = typeof loadouts.$inferInsert;
 
@@ -75,7 +79,10 @@ export const loadoutItems = pgTable(
       .notNull()
       .references(() => gearItems.id, { onDelete: 'cascade' }),
   }, 
-  (table) => [primaryKey({ columns: [table.loadoutId, table.gearItemId] })],
+  (table) => [
+    primaryKey({ columns: [table.loadoutId, table.gearItemId] }),
+    index().on(table.gearItemId),
+  ],
 );
 export type LoadoutItem = typeof loadoutItems.$inferSelect;
 export type NewLoadoutItem = typeof loadoutItems.$inferInsert;
@@ -102,7 +109,9 @@ export const songs = pgTable("songs", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index().on(table.userId),
+]);
 export type Song = typeof songs.$inferSelect;
 export type NewSong = typeof songs.$inferInsert;
 
@@ -115,7 +124,9 @@ export const tags = pgTable("tags", {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar({ length: 50 })
     .notNull(),
-});
+}, (table) => [
+  index().on(table.userId),
+]);
 export type Tag = typeof tags.$inferSelect;
 export type NewTag = typeof tags.$inferInsert;
 
@@ -129,7 +140,10 @@ export const songTags = pgTable(
       .notNull()
       .references(() => tags.id, { onDelete: 'cascade' }),
   },
-  (table) => [primaryKey({ columns: [table.songId, table.tagId] })],
+  (table) => [
+    primaryKey({ columns: [table.songId, table.tagId] }),
+    index().on(table.tagId),
+  ],
 );
 export type SongTag = typeof songTags.$inferSelect;
 export type NewSongTag = typeof songTags.$inferInsert;
@@ -161,7 +175,12 @@ export const presets = pgTable("presets", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index().on(table.userId),
+  index().on(table.songId),
+  index().on(table.loadoutId),
+  index().on(table.createdBy),
+]);
 export type Preset = typeof presets.$inferSelect;
 export type NewPreset = typeof presets.$inferInsert;
 
@@ -175,7 +194,10 @@ export const presetSettings = pgTable(
       .notNull()
       .references(() => gearItems.id, { onDelete: 'cascade' }),
     settings: text(),
-  }, (table) => [primaryKey({ columns: [table.presetId, table.gearItemId] })],
+  }, (table) => [
+    primaryKey({ columns: [table.presetId, table.gearItemId] }),
+    index().on(table.gearItemId),
+  ],
 );
 export type PresetSetting = typeof presetSettings.$inferSelect;
 export type NewPresetSetting = typeof presetSettings.$inferInsert;
