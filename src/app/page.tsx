@@ -1,10 +1,8 @@
 import Image from "next/image";
 import { db } from "@/db/index";
 import { desc } from 'drizzle-orm'
-import { usersTable } from "@/db/schema";
 
 export default async function Home() {
-  const allUsers = await db.select().from(usersTable).orderBy(desc(usersTable.id));
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
