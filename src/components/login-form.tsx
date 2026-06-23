@@ -1,6 +1,6 @@
 'use client'
-import { useActionState, useCallback } from 'react';
-import { authenticate } from '@/app/lib/actions';
+import { useActionState } from 'react';
+import { authenticate } from '@/app/lib/actions/login';
 import { useSearchParams } from 'next/navigation';
 
 export default function LoginForm() {
@@ -11,17 +11,20 @@ export default function LoginForm() {
         undefined,
     )
     return (
-        <form action={formAction}>
+        <form action={formAction} noValidate={true}>
             <label htmlFor="credentials-email">
                 Email
-                <input type="email" id="credentials-email" name="email" />
+                <input className="bg-white text-black" type="email" id="credentials-email" name="email" />
             </label>
             <label htmlFor="credentials-password">
                 Password
-                <input type="password" id="credentials-password" name="password" />
+                <input className="bg-white text-black" type="password" id="credentials-password" name="password" />
             </label>
-            <input type="submit" value="Sign In" />
             <div>
+                <input type="hidden" name="redirectTo" value={callbackUrl} />
+                <button aria-disabled={isPending}>Sign In</button>
+            </div>
+            <div className="text-red-500">
                 {errorMessage && (
                     <p>{errorMessage}</p>
                 )}
