@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey, index } from "drizzle-orm/pg-core";
 
+
 export const users = pgTable("users", {
   id: integer()
     .primaryKey()
@@ -8,6 +9,8 @@ export const users = pgTable("users", {
   email: varchar({ length: 255 })
     .notNull()
     .unique(),
+  passwordHash: text()
+    .notNull(),
   createdAt: timestamp({mode: 'date'})
     .defaultNow()
     .notNull(),
@@ -69,7 +72,7 @@ export const loadouts = pgTable("loadouts", {
 export type Loadout = typeof loadouts.$inferSelect;
 export type NewLoadout = typeof loadouts.$inferInsert;
 
-export const loadoutItems = pgTable(
+export const loadoutItems = pgTable( //delete, just add gear item to loadout
   "loadout_gear_items", 
   {
     loadoutId: integer()
