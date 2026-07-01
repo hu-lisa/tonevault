@@ -1,32 +1,38 @@
+'use client'
 import Link from "next/link";
-import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarFooter } from "../ui/sidebar";
+import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarFooter, SidebarMenuItem } from "../ui/sidebar";
+import { usePathname } from "next/navigation";
+
+const links = [
+    {href: '/dashboard', label: 'Home'},
+    {href: '/dashboard/songs', label: 'Songs'},
+    {href: '/dashboard/gear', label: 'Gear'},
+];
 
 export default function SideNav() {
+    const pathname = usePathname();
+
     return (
-        <Sidebar variant="inset">
+        <Sidebar collapsible="none" className="h-screen">
         <SidebarHeader>Menu</SidebarHeader>
         <SidebarContent>
             <SidebarGroup>
                 <SidebarMenu>
-                    <SidebarMenuButton asChild isActive>
-                        <Link href='/dashboard'>Home</Link>
-                    </SidebarMenuButton>
-                </SidebarMenu>
-                <SidebarMenu>
-                    <SidebarMenuButton asChild isActive>
-                        <Link href='/dashboard/songs'>Songs</Link>
-                    </SidebarMenuButton>
-                </SidebarMenu>
-                <SidebarMenu>
-                    <SidebarMenuButton asChild isActive>
-                        <Link href='/dashboard/gear'>Gear</Link>
-                    </SidebarMenuButton>
+                    {links.map((link) => (
+                        <SidebarMenuItem key={link.href}>
+                            <SidebarMenuButton asChild isActive={pathname === link.href}>
+                                <Link href={link.href}>
+                                    <span>{link.label}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
                 </SidebarMenu>
             </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
             <SidebarMenu>
-                <SidebarMenuButton asChild isActive>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/account'}>
                     <Link href='/dashboard/account'>Account</Link>
                 </SidebarMenuButton>
             </SidebarMenu>
