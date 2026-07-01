@@ -1,7 +1,7 @@
 'use client'
 import { useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { signup } from '@/app/lib/actions/signup';
+import { signup } from '@/app/actions/signup';
 
 export default function SignUpForm() {
     const searchParams = useSearchParams();

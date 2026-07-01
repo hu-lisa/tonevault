@@ -1,5 +1,5 @@
-import NextAuth from "next-auth";
-import { authConfig } from "../../../../auth.config";
+import NextAuth, { type DefaultSession } from "next-auth";
+import { authConfig } from "../../../auth.config";
 import Credentials from "next-auth/providers/credentials"
 import z from "zod";
 import type { User } from '@/db/schema';
@@ -19,8 +19,35 @@ export async function getUser(email: string): Promise<User | undefined> {
     }
 }
 
+declare module "next-auth" {
+    interface Session {
+      user: {
+        id: string
+      } & DefaultSession["user"]
+    }
+};
+
+declare module "@auth/core/jwt" {
+    interface JWT {
+        id: string
+    }
+}
+
 export const { signIn, signOut, auth } = NextAuth({
     ...authConfig,
+    callbacks: {
+        ...authConfig.callbacks,
+        jwt({ token, user }) {
+          if (user?.id) {
+            token.id = user.id
+          }
+          return token
+        },
+        session({ session, token }) {
+          session.user.id = token.id
+          return session
+        },
+    },
     providers: [
         Credentials({
             async authorize(credentials) {
