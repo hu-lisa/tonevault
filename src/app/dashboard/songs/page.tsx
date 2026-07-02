@@ -1,36 +1,29 @@
-import SongTable from "@/components/dashboard/songtable";
+'use server'
+import { auth } from "@/app/actions/auth";
+import { getSongs } from "@/app/actions/songs";
+import SongTable from "@/components/dashboard/songs/songtable";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const songs = [
-    {title: 'Song 1', artist: 'Artist 1', tags: ['tag 1', 'tag 2', 'tag 3',], practiced: '6/30/26'},
-    {title: 'Song 2', artist: 'Artist 2', tags: ['tag 1', 'tag 2',], practiced: '6/27/26'},
-    {title: 'Song 3', artist: 'Artist 3', tags: ['tag 2', 'tag 3',], practiced: '6/30/26'},
-    {title: 'Song 4', artist: 'Artist 4', tags: ['tag 3',], practiced: '6/30/26'},
-];
-const current = [
-    {title: 'Current 1', artist: 'Artist 1', tags: ['tag 1', 'tag 2', 'tag 3',], practiced: '6/30/26'},
-    {title: 'Current 2', artist: 'Artist 2', tags: ['tag 1', 'tag 2',], practiced: '6/27/26'},
-];
-const learned = [
-    {title: 'Learned 1', artist: 'Artist 1', tags: ['tag 1', 'tag 2', 'tag 3',], practiced: '6/30/26'},
-    {title: 'Learned 2', artist: 'Artist 2', tags: ['tag 1', 'tag 2',], practiced: '6/27/26'},
-];
-const planned = [
-    {title: 'Planned 1', artist: 'Artist 1', tags: ['tag 1', 'tag 2', 'tag 3',], practiced: '6/30/26'},
-    {title: 'Planned 2', artist: 'Artist 2', tags: ['tag 1', 'tag 2',], practiced: '6/27/26'},
-];
+import { Song, songs } from "@/db/schema";
+import { redirect } from "next/navigation";
 
 const songTabs = [
-    {tab: 'all', arr: songs},
-    {tab: 'current', arr: current},
-    {tab: 'learned', arr: learned},
-    {tab: 'planned', arr: planned},
+    {value: 'all', display: 'All Songs'},
+    {value: 'currently_learning', display: 'Currently Learning'},
+    {value: 'learned', display: 'Learned'},
+    {value: 'want_to_learn', display: 'Planned'},
 ];
 
-export default function Page()  {
+export default async function Page()  {
+    const session = await auth();
+    if (!session) {
+        redirect('/');
+    }
+    const userId = Number(session.user.id);
+
+    const songList = await getSongs(userId);
     return (
         <div className="flex flex-col space-y-1">
             <div className="flex flex-row">
@@ -44,16 +37,16 @@ export default function Page()  {
                             <Input id="search" autoComplete="off" placeholder="Search for a song" />
                         </Field>
                         <TabsList className="ml-auto">
-                            <TabsTrigger value="all">All Songs</TabsTrigger>
-                            <TabsTrigger value="current">Currently Learning</TabsTrigger>
-                            <TabsTrigger value="learned">Learned</TabsTrigger>
-                            <TabsTrigger value="planned">Planned</TabsTrigger>
+                            {songTabs.map((tab) => (
+                                <TabsTrigger key={tab.value} value={tab.value}>{tab.display}</TabsTrigger>
+                            ))}
                         </TabsList>
                     </div>
-
-                    {songTabs.map((songTab) => (
-                        <TabsContent value={songTab.tab} key={songTab.tab}>
-                            <SongTable songs={songTab.arr} />
+                    {songTabs.map((tab) => (
+                        <TabsContent key={tab.value} value={tab.value}>
+                            <SongTable songs={songList.filter((song: Song) => (
+                                (tab.value === 'all') ? song : song.status === tab.value
+                            ))}/>
                         </TabsContent>
                     ))}
                 </Tabs>

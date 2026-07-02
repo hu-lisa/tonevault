@@ -7,32 +7,26 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Song } from "@/db/schema";
 
-type Temp = {
-    title: string,
-    artist: string,
-    tags: string[],
-    practiced: string,
-};
-
-export default function SongTable({ songs }: { songs: any[] }) {
+export default function SongTable({ songs }: { songs: Song[] }) {
     return (
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Song</TableHead>
-                    <TableHead>Artist</TableHead>
+                    <TableHead className="w-80">Song</TableHead>
+                    <TableHead className="w-65">Artist</TableHead>
                     <TableHead>Tags</TableHead>
                     <TableHead className="text-right">Last Practiced</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {songs.map((song) => (
-                    <TableRow key={song.title}>
+                    <TableRow key={song.id}>
                         <TableCell>{song.title}</TableCell>
                         <TableCell>{song.artist}</TableCell>
-                        <TableCell>{(song.tags) ? song.tags[0] : ""}</TableCell>
-                        <TableCell className="text-right">{song.practiced}</TableCell>
+                        <TableCell>{}</TableCell>
+                        <TableCell className="text-right">{song.lastPracticedAt?.toLocaleDateString()}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
