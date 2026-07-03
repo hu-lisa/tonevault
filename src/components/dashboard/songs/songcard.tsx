@@ -1,16 +1,19 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Song } from "@/db/schema";
+import Link from "next/link";
 
 export default function SongCard({ song }: { song: Song }) {
     return (
-        <Card key={song.title}>
-            <CardHeader>
-                <CardTitle>{song.title}</CardTitle>
-                <CardDescription>{song.artist}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p>{`Last Practiced ${song.lastPracticedAt?.toLocaleDateString()}`}</p>
-            </CardContent>
-        </Card>
+        <Link href={`/dashboard/songs/${song.id}`} className="hover:opacity-80">
+            <Card key={song.title}>
+                <CardHeader>
+                    <CardTitle>{song.title}</CardTitle>
+                    <CardDescription>{song.artist}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p>{`Last Practiced ${(song.lastPracticedAt) ? song.lastPracticedAt.toLocaleDateString() : 'Never'}`}</p>
+                </CardContent>
+            </Card>
+        </Link>
     )
 }

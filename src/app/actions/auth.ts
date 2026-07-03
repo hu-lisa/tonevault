@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import { db } from '@/db/index';
 import { users } from '@/db/schema'
 import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
 export async function getUser(email: string): Promise<User | undefined> {
     try {
@@ -17,6 +18,15 @@ export async function getUser(email: string): Promise<User | undefined> {
         console.error('Failed to fetch user: ', error);
         throw new Error('Failed to fetch user.');
     }
+}
+
+export async function getUserId() {
+    const session = await auth();
+    if (!session) {
+        redirect('/');
+    }
+    const userId = Number(session.user.id);
+    return userId;
 }
 
 declare module "next-auth" {
