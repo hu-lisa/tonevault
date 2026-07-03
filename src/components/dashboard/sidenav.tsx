@@ -20,7 +20,11 @@ export default function SideNav() {
                 <SidebarMenu>
                     {links.map((link) => (
                         <SidebarMenuItem key={link.href}>
-                            <SidebarMenuButton asChild isActive={pathname === link.href}>
+                            <SidebarMenuButton asChild isActive={
+                                (link.href.startsWith('/dashboard/songs')) ? 
+                                    pathname.startsWith('/dashboard/songs') :
+                                    pathname === link.href
+                            }>
                                 <Link href={link.href}>
                                     <span>{link.label}</span>
                                 </Link>
