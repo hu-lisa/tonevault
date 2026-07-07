@@ -1,3 +1,5 @@
+'use client'
+import { updateSong } from "@/app/actions/songs";
 import {
     Select,
     SelectContent,
@@ -10,7 +12,9 @@ import { Song } from "@/db/schema";
 
 export default function StatusMenu({ song }: { song: Song }) {
     return (
-        <Select defaultValue={song.status}>
+        <Select defaultValue={song.status} onValueChange={(value) => {
+            updateSong({status: value}, song.id, song.userId);
+        }}>
             <SelectTrigger>
                 <SelectValue />
             </SelectTrigger>

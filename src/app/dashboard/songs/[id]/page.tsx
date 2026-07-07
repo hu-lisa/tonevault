@@ -1,5 +1,8 @@
 import { getUserId } from "@/app/actions/auth";
-import { getSongById } from "@/app/actions/songs";
+import { getSongById, updateSong } from "@/app/actions/songs";
+import DeleteButton from "@/components/dashboard/songs/deleteform";
+import EditForm from "@/components/dashboard/songs/editform";
+import PracticeButton from "@/components/dashboard/songs/practicebutton";
 import StatusMenu from "@/components/dashboard/songs/statusmenu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,7 +13,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const { id } = await params;
     const songId = Number(id);
 
-    const userId =  await getUserId();
+    const userId = await getUserId();
     const song = await getSongById(songId, userId);
     if (!song) {
         notFound();
@@ -25,8 +28,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <StatusMenu song={song} />
                 </div>
                 <div className="flex flex-row space-x-2">
-                    <Button variant="outline">Edit</Button>
-                    <Button variant="destructive">Delete</Button>
+                    <EditForm song={song} userId={userId} />
+                    <DeleteButton songId={songId} userId={userId}/>
                 </div>
             </div>
             <div className="flex flex-row items-center justify-between">
@@ -39,10 +42,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             </div>
             <div className="flex flex-row justify-between">
                 <div className="flex flex-row space-x-2">
-
                 </div>
                 <div className="flex flex-row space-x-2">
-                    <Button variant="outline">Practice</Button>
+                    <PracticeButton songId={songId} userId={userId} />
                 </div>
             </div>
             <Separator />
