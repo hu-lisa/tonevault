@@ -11,7 +11,7 @@ export default function SongCard({ song }: { song: Song }) {
                     <CardDescription>{song.artist}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p>{`Last Practiced ${(song.lastPracticedAt) ? song.lastPracticedAt.toLocaleDateString() : 'Never'}`}</p>
+                    <p>{`Last Practiced ${(song.lastPracticedAt) ? song.lastPracticedAt.toLocaleDateString() : 'Not Logged'}`}</p>
                 </CardContent>
             </Card>
         </Link>

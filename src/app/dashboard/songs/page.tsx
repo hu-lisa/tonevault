@@ -1,6 +1,7 @@
 'use server'
 import { auth } from "@/app/actions/auth";
 import { getSongs } from "@/app/actions/songs";
+import CreateForm from "@/components/dashboard/songs/createform";
 import SongTable from "@/components/dashboard/songs/songtable";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
@@ -26,9 +27,9 @@ export default async function Page()  {
     const songList = await getSongs(userId);
     return (
         <div className="flex flex-col space-y-1">
-            <div className="flex flex-row">
+            <div className="flex flex-row justify-between">
                 <header>Songs</header>
-                <Button variant="outline" className="ml-auto">Add Song</Button>
+                <CreateForm userId={userId} />
             </div>
             <div>
                 <Tabs defaultValue="all">

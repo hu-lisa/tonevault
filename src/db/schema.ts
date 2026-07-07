@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey, index } from "drizzle-orm/pg-core";
-
+import { createInsertSchema } from "drizzle-zod";
+import z from "zod";
 
 export const users = pgTable("users", {
   id: integer()
@@ -104,7 +105,7 @@ export const songs = pgTable("songs", {
   status: varchar({ enum: ['want_to_learn', 'currently_learning', 'learned'] })
     .notNull(),
   source_link: text(),
-  lastPracticedAt: timestamp(),
+  lastPracticedAt: timestamp({mode: 'date'}),
   createdAt: timestamp({mode: 'date'})
     .defaultNow()
     .notNull(),
@@ -260,3 +261,13 @@ export const presetSettingsRelations = relations(presetSettings, ({ one }) => ({
   gearItem: one(gearItems, { fields: [presetSettings.gearItemId], references: [gearItems.id] }),
   preset: one(presets, { fields: [presetSettings.presetId], references: [presets.id] }),
 }));
+
+//Zod validation schemas
+const songSchema = createInsertSchema(songs);
+export const songFormSchema = songSchema
+  .omit({ userId: true, createdAt: true, updatedAt: true, lastPracticedAt: true })
+  .extend({
+    title: songSchema.shape.title.min(1, "Song must have a title"),
+    artist: songSchema.shape.artist.min(1, "Song must have an artist."),
+});
+export type SongFormValues = z.infer<typeof songFormSchema>;

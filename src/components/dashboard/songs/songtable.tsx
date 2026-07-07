@@ -32,7 +32,7 @@ export default function SongTable({ songs }: { songs: Song[] }) {
                         <TableCell>{song.artist}</TableCell>
                         <TableCell>{}</TableCell>
                         <TableCell className="text-right">
-                            {(song.lastPracticedAt) ? song.lastPracticedAt.toLocaleDateString() : 'Never'}
+                            {(song.lastPracticedAt) ? song.lastPracticedAt.toLocaleDateString() : 'Not Logged'}
                         </TableCell>
                         {/*if adding clickable things, make sure to disable propagation and make the z index higher than 10*/}
                     </TableRow>
