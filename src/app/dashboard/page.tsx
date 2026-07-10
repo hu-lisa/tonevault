@@ -1,16 +1,12 @@
 import SongTable from "@/components/dashboard/songs/songtable";
 import SongCard from "@/components/dashboard/songs/songcard";
 import { redirect } from "next/navigation";
-import { auth } from "../actions/auth";
+import { auth, getUserId } from "../actions/auth";
 import { getCurrentSongs } from "../actions/songs";
 
 export default async function Page()  {
-    const session = await auth();
-    if (!session) {
-        redirect('/');
-    }
-    const userId = Number(session.user.id);
 
+    const userId = await getUserId();
     const songs = await getCurrentSongs(userId);
 
     return (

@@ -5,30 +5,13 @@ import { getUser, signIn } from './auth';
 import bcrypt from 'bcrypt';
 import { db } from '@/db';
 import { users } from '@/db/schema';
+import { AuthError } from 'next-auth';
 
-
-const SignUpSchema = z.object({
-    email: z.email("Please enter a valid email address."),
-    password: z.string().min(6, "Password must be longer than 6 characters."),
-});
-
-export async function signup(
-    prevState: any,
-    formData: FormData,
-) {
-    const parsedCredentials = SignUpSchema.safeParse({
-        email: formData.get('email'),
-        password: formData.get('password'),
-    });
-    if (!parsedCredentials.success) {
-        return { errors: z.flattenError(parsedCredentials.error).fieldErrors};
-    }
-
-    const { email, password } = parsedCredentials.data;
+export async function signup({ email, password }: { email: string, password: string }) {
 
     const existingUser = await getUser(email);
     if (existingUser) {
-        return { errors: { email: ['User already exists. Please use the login page.'] }};
+        return { errors: 'User already exists. Please use the login page.' };
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -36,8 +19,15 @@ export async function signup(
     try {
         await db.insert(users).values({ email, passwordHash });
     } catch {
-        return { errors: { email: ['User already exists. Please use the login page.'] }};
+        return { errors: 'User already exists. Please use the login page.' };
     }
-    await signIn('credentials', formData);
-    return { success: [true] };
+
+    try {
+        await signIn('credentials', { email: email, password: password, redirectTo: '/dashboard' });
+    } catch (error) {
+        if (error instanceof AuthError) {
+            return { errors: 'Something went wrong.' };
+        }
+        throw error;
+    }
 }
