@@ -14,9 +14,9 @@ export default async function Page() {
             <header className="text-2xl">Profile</header>
             <AccountPanel email={email} />
             <Separator />
-            <div className="flex flex-row">
-                <Button variant="outline">Change Password</Button>
+            <div className="flex flex-row-reverse space-x-2">
                 <Button variant="destructive">Delete Account</Button>
+                <Button variant="outline">Change Password</Button>
             </div>
         </div>
     )

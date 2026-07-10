@@ -16,5 +16,5 @@ export async function getEmail(id: number) {
 }
 
 export async function updatePassword(id: number, prev: string, pw: string) {
-    
+
 }
