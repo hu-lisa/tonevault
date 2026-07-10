@@ -2,6 +2,12 @@
 import { useActionState } from 'react';
 import { authenticate } from '@/app/actions/login';
 import { useSearchParams } from 'next/navigation';
+import { Field, FieldError, FieldGroup } from '../ui/field';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { error } from 'console';
 
 export default function LoginForm() {
     const searchParams = useSearchParams();
@@ -11,24 +17,41 @@ export default function LoginForm() {
         undefined,
     )
     return (
-        <form action={formAction} noValidate={true}>
-            <label htmlFor="credentials-email">
-                Email
-                <input className="bg-white text-black" type="email" id="credentials-email" name="email" />
-            </label>
-            <label htmlFor="credentials-password">
-                Password
-                <input className="bg-white text-black" type="password" id="credentials-password" name="password" />
-            </label>
-            <div>
-                <input type="hidden" name="redirectTo" value={callbackUrl} />
-                <button aria-disabled={isPending}>Sign In</button>
-            </div>
-            <div className="text-red-500">
-                {errorMessage && (
-                    <p>{errorMessage}</p>
-                )}
-            </div>
-        </form>
+        <div className="flex h-screen items-center justify-center">
+            <form action={formAction} noValidate={true}>
+                <Card>
+
+                    <CardHeader>
+                        <CardTitle>Login to your account</CardTitle>
+                        <CardDescription>
+                            Enter your email below to login to your account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input id="password" type="password" name="password" />
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter className="flex-col gap-2">
+                        <input type="hidden" name="redirectTo" value={callbackUrl} />
+                        <Button aria-disabled={isPending} type="submit" className="w-full">
+                            Login
+                        </Button>
+                        {errorMessage && <FieldError errors={[{ message: errorMessage }]} />}
+                    </CardFooter>
+                </Card>
+            </form>
+        </div>
     )
 }
