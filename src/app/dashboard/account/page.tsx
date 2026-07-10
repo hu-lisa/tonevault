@@ -1,6 +1,5 @@
 import { getEmail } from "@/app/actions/account";
 import { getUserId } from "@/app/actions/auth";
-import { logOut } from "@/app/actions/login";
 import AccountPanel from "@/components/dashboard/account/accountpanel";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
