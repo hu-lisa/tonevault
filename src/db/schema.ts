@@ -271,3 +271,14 @@ export const songFormSchema = songSchema
     artist: songSchema.shape.artist.min(1, "Song must have an artist."),
 });
 export type SongFormValues = z.infer<typeof songFormSchema>;
+
+const gearSchema = createInsertSchema(gearItems);
+export const gearFormSchema = gearSchema
+  .omit({ userId: true, createdAt: true, updatedAt: true})
+  .extend({
+    name: gearSchema.shape.name.min(1, "Gear item must have a name"),
+    type: z.enum(gearSchema.shape.type.options, {
+      error: (issue) => issue.input === undefined ? "Gear item must have a type" : undefined,
+    }),
+});
+export type GearFormValues = z.infer<typeof gearFormSchema>;
