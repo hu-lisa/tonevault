@@ -1,6 +1,6 @@
 'use client'
 
-import { NewSong } from "@/db/schema";
+import { gearFormSchema, GearFormValues, NewGearItem, NewSong } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
 import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,22 +11,24 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { addSong } from "@/app/actions/songs";
 import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import { addGear } from "@/app/actions/gear";
+import { Textarea } from "@/components/ui/textarea";
 
 
 export default function CreateForm({ userId }: { userId: number }) {
     const [open, setOpen] = useState(false);
-    const form = useForm<SongFormValues>({
-        resolver: zodResolver(songFormSchema),
+    const form = useForm<GearFormValues>({
+        resolver: zodResolver(gearFormSchema),
         defaultValues: {
-            title: "",
-            artist: "",
-            status: 'currently_learning',
+            name: "",
+            notes: "",
+            type: undefined,
         },
     });
 
-    async function onSubmit(data: SongFormValues) {
-        const song: NewSong = { ...data, userId: userId };
-        const result = await addSong(song);
+    async function onSubmit(data: GearFormValues) {
+        const gear: NewGearItem = { ...data, userId: userId };
+        const result = await addGear(gear);
 
         if (result?.error) {
             form.setError('root', {
@@ -46,30 +48,30 @@ export default function CreateForm({ userId }: { userId: number }) {
                 form.reset();
             }
         }}>
-            <form id="create-song" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="create-gear" onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Add Song</Button>
+                    <Button variant="outline">Add Gear</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>Add Song</DialogTitle>
+                        <DialogTitle>Add Gear Item</DialogTitle>
                         <DialogDescription>
-                            Add a song to your library.
+                            Add a guitar, amp, or pedal to your library.
                         </DialogDescription>
                     </DialogHeader>
 
                     <FieldGroup>
                         <Controller
-                            name="title"
+                            name="name"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-title">
-                                        Title
+                                    <FieldLabel htmlFor="create-gear-name">
+                                        Name
                                     </FieldLabel>
                                     <Input
                                         {...field}
-                                        id="create-song-title"
+                                        id="create-gear-name"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                     />
@@ -80,17 +82,19 @@ export default function CreateForm({ userId }: { userId: number }) {
                             )}
                         />
                         <Controller
-                            name="artist"
+                            name="notes"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-artist">
-                                        Artist
+                                    <FieldLabel htmlFor="create-gear-notes">
+                                        Notes
                                     </FieldLabel>
-                                    <Input
+                                    <Textarea 
                                         {...field}
-                                        id="create-song-artist"
+                                        value={field.value ?? ""}
+                                        id="create-gear-notes" 
                                         aria-invalid={fieldState.invalid}
+                                        placeholder="Knobs, switches, etc..."
                                         autoComplete="off"
                                     />
                                     {fieldState.invalid && (
@@ -100,22 +104,22 @@ export default function CreateForm({ userId }: { userId: number }) {
                             )}
                         />
                         <Controller
-                            name="status"
+                            name="type"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-status">
-                                        Status
+                                    <FieldLabel htmlFor="create-gear-type">
+                                        Type
                                     </FieldLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <SelectTrigger id="create-song-status">
-                                            <SelectValue />
+                                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                                        <SelectTrigger id="create-gear-type">
+                                            <SelectValue placeholder="Select a gear type"/>
                                         </SelectTrigger>
                                         <SelectContent position="popper">
                                             <SelectGroup>
-                                                <SelectItem value="currently_learning">Currently Learning</SelectItem>
-                                                <SelectItem value="learned">Learned</SelectItem>
-                                                <SelectItem value="want_to_learn">Planned</SelectItem>
+                                                <SelectItem value="guitar">Guitar</SelectItem>
+                                                <SelectItem value="amp">Amp</SelectItem>
+                                                <SelectItem value="pedal">Pedal</SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -135,7 +139,7 @@ export default function CreateForm({ userId }: { userId: number }) {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-song">Add</Button>
+                        <Button type="submit" form="create-gear">Add</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
