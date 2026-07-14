@@ -7,7 +7,6 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
-import { error } from 'console';
 
 export default function LoginForm() {
     const searchParams = useSearchParams();

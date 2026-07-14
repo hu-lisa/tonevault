@@ -1,6 +1,6 @@
 'use client'
 
-import { NewSong, Song } from "@/db/schema";
+import { gearFormSchema, GearFormValues, GearItem, NewGearItem, NewSong } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
 import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,25 +8,27 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { addSong, updateSong } from "@/app/actions/songs";
-import { redirect } from "next/navigation";
+import { addSong } from "@/app/actions/songs";
 import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import { addGear, updateGear } from "@/app/actions/gear";
+import { Textarea } from "@/components/ui/textarea";
+import { PencilIcon } from "lucide-react";
 
 
-export default function EditForm({ userId, song }: { userId: number, song: Song }) {
+export default function EditForm({ gear, userId }: { gear: GearItem, userId: number }) {
     const [open, setOpen] = useState(false);
-    const form = useForm<SongFormValues>({
-        resolver: zodResolver(songFormSchema),
+    const form = useForm<GearFormValues>({
+        resolver: zodResolver(gearFormSchema),
         defaultValues: {
-            title: song.title,
-            artist: song.artist,
-            status: song.status,
+            name: gear.name,
+            notes: gear.notes,
+            type: gear.type,
         },
     });
 
-    async function onSubmit(data: SongFormValues) {
-        const result = await updateSong(data, song.id, userId);
+    async function onSubmit(data: GearFormValues) {
+        const result = await updateGear(data, gear.id, userId);
 
         if (result?.error) {
             form.setError('root', {
@@ -36,48 +38,42 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
             return;
         }
         setOpen(false);
-        form.reset({
-            title: song.title,
-            artist: song.artist,
-            status: song.status,
-        });
+        form.reset();
     }
 
     return (
         <Dialog open={open} onOpenChange={(nextOpen) => {
             setOpen(nextOpen);
-            if (nextOpen) {
-                form.reset({
-                    title: song.title,
-                    artist: song.artist,
-                    status: song.status,
-                });
+            if (!nextOpen) {
+                form.reset();
             }
         }}>
-            <form id="edit-song" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="edit-gear" onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Edit</Button>
+                    <Button variant="outline" size="icon">
+                        <PencilIcon />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>Edit Song</DialogTitle>
+                        <DialogTitle>Edit Gear Item</DialogTitle>
                         <DialogDescription>
-                            Make changes to the title and artist.
+                            Change a gear item's name, notes, or type.
                         </DialogDescription>
                     </DialogHeader>
 
                     <FieldGroup>
                         <Controller
-                            name="title"
+                            name="name"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-title">
-                                        Title
+                                    <FieldLabel htmlFor="edit-gear-name">
+                                        Name
                                     </FieldLabel>
                                     <Input
                                         {...field}
-                                        id="create-song-title"
+                                        id="edit-gear-name"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                     />
@@ -88,19 +84,47 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
                             )}
                         />
                         <Controller
-                            name="artist"
+                            name="notes"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-artist">
-                                        Artist
+                                    <FieldLabel htmlFor="edit-gear-notes">
+                                        Notes
                                     </FieldLabel>
-                                    <Input
+                                    <Textarea 
                                         {...field}
-                                        id="create-song-artist"
+                                        value={field.value ?? ""}
+                                        id="edit-gear-notes" 
                                         aria-invalid={fieldState.invalid}
+                                        placeholder="Knobs, switches, etc..."
                                         autoComplete="off"
                                     />
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="type"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor="edit-gear-type">
+                                        Status
+                                    </FieldLabel>
+                                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                                        <SelectTrigger id="edit-gear-type">
+                                            <SelectValue/>
+                                        </SelectTrigger>
+                                        <SelectContent position="popper">
+                                            <SelectGroup>
+                                                <SelectItem value="guitar">Guitar</SelectItem>
+                                                <SelectItem value="amp">Amp</SelectItem>
+                                                <SelectItem value="pedal">Pedal</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}
@@ -117,7 +141,7 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="edit-song">Save changes</Button>
+                        <Button type="submit" form="edit-gear">Update</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
