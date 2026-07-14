@@ -54,7 +54,7 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
                 });
             }
         }}>
-            <form id="create-song" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="edit-song" onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
                     <Button variant="outline">Edit</Button>
                 </DialogTrigger>
@@ -117,7 +117,7 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-song">Save changes</Button>
+                        <Button type="submit" form="edit-song">Save changes</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

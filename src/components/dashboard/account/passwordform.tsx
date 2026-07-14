@@ -1,32 +1,32 @@
 'use client'
 
-import { NewSong } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
-import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { addSong } from "@/app/actions/songs";
 import { useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import * as z from 'zod';
+import { updatePassword, validate } from "@/app/actions/account";
 
+const formSchema = z.object({
+    oldPassword: z.string().min(6, 'Password is at least 6 characters.'),
+    newPassword: z.string().min(6, 'Password is at least 6 characters.'),
+});
 
-export default function CreateForm({ userId }: { userId: number }) {
+export default function PasswordForm({ userId }: { userId: number }) {
     const [open, setOpen] = useState(false);
-    const form = useForm<SongFormValues>({
-        resolver: zodResolver(songFormSchema),
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
         defaultValues: {
-            title: "",
-            artist: "",
-            status: 'currently_learning',
+            oldPassword: '',
+            newPassword: '',
         },
     });
 
-    async function onSubmit(data: SongFormValues) {
-        const song: NewSong = { ...data, userId: userId };
-        const result = await addSong(song);
+    async function onSubmit(data: z.infer<typeof formSchema>) {
+        const result = await validate(userId, data.oldPassword);
 
         if (result?.error) {
             form.setError('root', {
@@ -35,6 +35,17 @@ export default function CreateForm({ userId }: { userId: number }) {
             });
             return;
         }
+
+        const change = await updatePassword(userId, data.newPassword);
+
+        if (change?.error) {
+            form.setError('root', {
+                type: 'manual',
+                message: change.error,
+            });
+            return;
+        }
+
         setOpen(false);
         form.reset();
     }
@@ -46,30 +57,30 @@ export default function CreateForm({ userId }: { userId: number }) {
                 form.reset();
             }
         }}>
-            <form id="create-song" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="change-pw" onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Add Song</Button>
+                    <Button variant="outline">Change Password</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>Add Song</DialogTitle>
+                        <DialogTitle>Change Password</DialogTitle>
                         <DialogDescription>
-                            Add a song to your library.
+                            Enter your old and new passwords
                         </DialogDescription>
                     </DialogHeader>
 
                     <FieldGroup>
                         <Controller
-                            name="title"
+                            name="oldPassword"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-title">
-                                        Title
+                                    <FieldLabel htmlFor="old-pw">
+                                        Old Password
                                     </FieldLabel>
                                     <Input
                                         {...field}
-                                        id="create-song-title"
+                                        id="old-pw"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                     />
@@ -80,45 +91,19 @@ export default function CreateForm({ userId }: { userId: number }) {
                             )}
                         />
                         <Controller
-                            name="artist"
+                            name="newPassword"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-artist">
-                                        Artist
+                                    <FieldLabel htmlFor="new-pw">
+                                        New Password
                                     </FieldLabel>
                                     <Input
                                         {...field}
-                                        id="create-song-artist"
+                                        id="new-pw"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                     />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        />
-                        <Controller
-                            name="status"
-                            control={form.control}
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="create-song-status">
-                                        Status
-                                    </FieldLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <SelectTrigger id="create-song-status">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent position="popper">
-                                            <SelectGroup>
-                                                <SelectItem value="currently_learning">Currently Learning</SelectItem>
-                                                <SelectItem value="learned">Learned</SelectItem>
-                                                <SelectItem value="want_to_learn">Planned</SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}
@@ -135,7 +120,7 @@ export default function CreateForm({ userId }: { userId: number }) {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="create-song">Add</Button>
+                        <Button type="submit" form="change-pw">Update</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

@@ -1,5 +1,5 @@
 'use server'
-import { auth } from "@/app/actions/auth";
+import { auth, getUserId } from "@/app/actions/auth";
 import { getSongs } from "@/app/actions/songs";
 import CreateForm from "@/components/dashboard/songs/createform";
 import SongTable from "@/components/dashboard/songs/songtable";
@@ -18,12 +18,7 @@ const songTabs = [
 ];
 
 export default async function Page()  {
-    const session = await auth();
-    if (!session) {
-        redirect('/');
-    }
-    const userId = Number(session.user.id);
-
+    const userId = await getUserId();
     const songList = await getSongs(userId);
     return (
         <div className="flex flex-col space-y-1">
