@@ -1,5 +1,9 @@
 import { getUserId } from "@/app/actions/auth";
+import { getLoadouts } from "@/app/actions/loadouts";
+import { getPresets } from "@/app/actions/presets";
 import { getSongById, updateSong } from "@/app/actions/songs";
+import CreateForm from "@/components/dashboard/presets/createform";
+import { PresetCard } from "@/components/dashboard/presets/presetcard";
 import DeleteButton from "@/components/dashboard/songs/deleteform";
 import EditForm from "@/components/dashboard/songs/editform";
 import PracticeButton from "@/components/dashboard/songs/practicebutton";
@@ -18,6 +22,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     if (!song) {
         notFound();
     }
+
+    const loadouts = await getLoadouts(userId);
+    const presets = await getPresets(userId, songId, null);
 
     return (
         <div className="flex flex-col space-y-2">
@@ -48,9 +55,14 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 </div>
             </div>
             <Separator />
-            <div className="flex flex-row items-center justify-between space-x-2">
-                <header className="text-2xl">Presets</header>
-                <Button variant="outline">Add Preset</Button>
+            <div className="flex flex-col space-y-2">
+                <div className="flex flex-row items-center justify-between space-x-2">
+                    <header className="text-2xl">Presets</header>
+                    <CreateForm userId={userId} songId={songId} loadouts={[{ id: null, name: 'Main' }, ...loadouts]}/>
+                </div>
+                {presets.map((p) => (
+                    <PresetCard key={p.id} preset={p} userId={userId} />
+                ))}
             </div>
         </div>
     )

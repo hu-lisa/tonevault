@@ -57,9 +57,6 @@ export const loadouts = pgTable("loadouts", {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar({ length: 255 })
     .notNull(),
-  isDefault: boolean()
-    .default(false)
-    .notNull(),
   createdAt: timestamp({mode: 'date'})
     .defaultNow()
     .notNull(),
@@ -73,7 +70,7 @@ export const loadouts = pgTable("loadouts", {
 export type Loadout = typeof loadouts.$inferSelect;
 export type NewLoadout = typeof loadouts.$inferInsert;
 
-export const loadoutItems = pgTable( //delete, just add gear item to loadout
+export const loadoutItems = pgTable(
   "loadout_gear_items", 
   {
     loadoutId: integer()
@@ -163,7 +160,6 @@ export const presets = pgTable("presets", {
     .notNull()
     .references(() => songs.id, { onDelete: 'cascade' }),
   loadoutId: integer()
-    .notNull()
     .references(() => loadouts.id, { onDelete: 'cascade' }),
   name: varchar({ length: 255 }),
   isPublic: boolean()
@@ -197,7 +193,7 @@ export const presetSettings = pgTable(
     gearItemId: integer()
       .notNull()
       .references(() => gearItems.id, { onDelete: 'cascade' }),
-    settings: text(),
+    settings: text().notNull(),
   }, (table) => [
     primaryKey({ columns: [table.presetId, table.gearItemId] }),
     index().on(table.gearItemId),
@@ -282,3 +278,12 @@ export const gearFormSchema = gearSchema
     }),
 });
 export type GearFormValues = z.infer<typeof gearFormSchema>;
+
+export const presetFormSchema = z.object({
+  name: z.string(),
+  loadoutId: z.number().nullable(),
+  presetSettings: z.array(z.object({
+    gearItemId: z.number(),
+    settings: z.string().min(1, "Setting cannot be empty"),
+  })).min(1, "Must select at least one gear item."),
+});

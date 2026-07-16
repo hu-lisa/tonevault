@@ -1,0 +1,1 @@
+ALTER TABLE "preset_settings" ALTER COLUMN "settings" SET NOT NULL;
