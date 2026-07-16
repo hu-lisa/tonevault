@@ -15,7 +15,7 @@ const formSchema = z.object({
     newPassword: z.string().min(6, 'Password is at least 6 characters.'),
 });
 
-export default function PasswordForm({ userId }: { userId: number }) {
+export default function PasswordForm() {
     const [open, setOpen] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -26,7 +26,7 @@ export default function PasswordForm({ userId }: { userId: number }) {
     });
 
     async function onSubmit(data: z.infer<typeof formSchema>) {
-        const result = await validate(userId, data.oldPassword);
+        const result = await validate(data.oldPassword);
 
         if (result?.error) {
             form.setError('root', {
@@ -36,7 +36,7 @@ export default function PasswordForm({ userId }: { userId: number }) {
             return;
         }
 
-        const change = await updatePassword(userId, data.newPassword);
+        const change = await updatePassword(data.newPassword);
 
         if (change?.error) {
             form.setError('root', {

@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PencilIcon } from "lucide-react";
 
 
-export default function EditForm({ gear, userId }: { gear: GearItem, userId: number }) {
+export default function EditForm({ gear }: { gear: GearItem }) {
     const [open, setOpen] = useState(false);
     const form = useForm<GearFormValues>({
         resolver: zodResolver(gearFormSchema),
@@ -28,7 +28,7 @@ export default function EditForm({ gear, userId }: { gear: GearItem, userId: num
     });
 
     async function onSubmit(data: GearFormValues) {
-        const result = await updateGear(data, gear.id, userId);
+        const result = await updateGear(data, gear.id);
 
         if (result?.error) {
             form.setError('root', {

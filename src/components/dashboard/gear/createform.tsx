@@ -15,7 +15,7 @@ import { addGear } from "@/app/actions/gear";
 import { Textarea } from "@/components/ui/textarea";
 
 
-export default function CreateForm({ userId }: { userId: number }) {
+export default function CreateForm() {
     const [open, setOpen] = useState(false);
     const form = useForm<GearFormValues>({
         resolver: zodResolver(gearFormSchema),
@@ -27,8 +27,7 @@ export default function CreateForm({ userId }: { userId: number }) {
     });
 
     async function onSubmit(data: GearFormValues) {
-        const gear: NewGearItem = { ...data, userId: userId };
-        const result = await addGear(gear, null);
+        const result = await addGear(data, null);
 
         if (result?.error) {
             form.setError('root', {

@@ -1,14 +1,13 @@
 import { getUserId } from "@/app/actions/auth";
 import { getLoadouts } from "@/app/actions/loadouts";
 import { getPresets } from "@/app/actions/presets";
-import { getSongById, updateSong } from "@/app/actions/songs";
+import { getSongById } from "@/app/actions/songs";
 import CreateForm from "@/components/dashboard/presets/createform";
 import { PresetCard } from "@/components/dashboard/presets/presetcard";
 import DeleteButton from "@/components/dashboard/songs/deleteform";
 import EditForm from "@/components/dashboard/songs/editform";
 import PracticeButton from "@/components/dashboard/songs/practicebutton";
 import StatusMenu from "@/components/dashboard/songs/statusmenu";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,13 +17,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const songId = Number(id);
 
     const userId = await getUserId();
-    const song = await getSongById(songId, userId);
+    const song = await getSongById(songId);
     if (!song) {
         notFound();
     }
 
-    const loadouts = await getLoadouts(userId);
-    const presets = await getPresets(userId, songId, null);
+    const loadouts = await getLoadouts();
+    const presets = await getPresets(songId, null);
 
     return (
         <div className="flex flex-col space-y-2">
@@ -35,8 +34,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <StatusMenu song={song} />
                 </div>
                 <div className="flex flex-row space-x-2">
-                    <EditForm song={song} userId={userId} />
-                    <DeleteButton songId={songId} userId={userId}/>
+                    <EditForm song={song} />
+                    <DeleteButton songId={songId} />
                 </div>
             </div>
             <div className="flex flex-row items-center justify-between">
@@ -51,17 +50,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <div className="flex flex-row space-x-2">
                 </div>
                 <div className="flex flex-row space-x-2">
-                    <PracticeButton songId={songId} userId={userId} />
+                    <PracticeButton songId={songId} />
                 </div>
             </div>
             <Separator />
             <div className="flex flex-col space-y-2">
                 <div className="flex flex-row items-center justify-between space-x-2">
                     <header className="text-2xl">Presets</header>
-                    <CreateForm userId={userId} songId={songId} loadouts={[{ id: null, name: 'Main' }, ...loadouts]}/>
+                    <CreateForm songId={songId} loadouts={[{ id: null, name: 'Main' }, ...loadouts]}/>
                 </div>
                 {presets.map((p) => (
-                    <PresetCard key={p.id} preset={p} userId={userId} />
+                    <PresetCard key={p.id} preset={p} />
                 ))}
             </div>
         </div>

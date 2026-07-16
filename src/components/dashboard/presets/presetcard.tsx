@@ -4,7 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Preset } from "@/db/schema";
 import { SettingsCard } from "./settingscard";
 
-export async function PresetCard({ userId, preset }: { userId: number, preset: Preset }) {
+export async function PresetCard({ preset }: { preset: Preset }) {
     const settings = await getSettings(preset.id);
     console.log(preset.name);
     return (

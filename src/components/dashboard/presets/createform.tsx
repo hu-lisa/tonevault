@@ -16,8 +16,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { addPreset, addSettings, presetExists } from '@/app/actions/presets';
+import { getUserId } from '@/app/actions/auth';
 
-export default function CreateForm({ userId, songId, loadouts }: { userId: number, songId: number, loadouts: { id: number | null, name: string }[] }) {
+export default function CreateForm({ songId, loadouts }: { songId: number, loadouts: { id: number | null, name: string }[] }) {
     const [page, setPage] = useState({ open: false, step: 1 });
     const [gear, setGear] = useState<GearItem[]>([]);
     const [isPending, startTransition] = useTransition();
@@ -46,7 +47,7 @@ export default function CreateForm({ userId, songId, loadouts }: { userId: numbe
     function handleLoadoutChange(loadoutId: number | null) {
         const id = ++requestId.current;
         startTransition(async () => {
-            const items = await getGearItems(userId, loadoutId);
+            const items = await getGearItems(loadoutId);
             if (id === requestId.current) {
                 setGear(items);
             }
@@ -56,10 +57,8 @@ export default function CreateForm({ userId, songId, loadouts }: { userId: numbe
 
     //handles form submit
     async function onSubmit(data: z.infer<typeof presetFormSchema>) {
-        const preset: NewPreset = { 
-            userId: userId, 
+        const preset = { 
             songId: songId, 
-            createdBy: userId, 
             createdAt: new Date(),
             name: data.name === "" ? "Main" : data.name,
             updatedAt: new Date(),
@@ -298,7 +297,7 @@ export default function CreateForm({ userId, songId, loadouts }: { userId: numbe
                                     });
                                     return;
                                 }
-                                const exists = await presetExists(userId, songId, loadoutId, name);
+                                const exists = await presetExists(songId, loadoutId, name);
                                 if (exists) {
                                     form.setError('name', {
                                         type: 'manual',

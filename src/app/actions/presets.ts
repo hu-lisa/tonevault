@@ -1,19 +1,23 @@
 'use server'
 
 import { db } from "@/db";
-import { gearItems, NewPreset, NewPresetSetting, presets, PresetSetting, presetSettings } from "@/db/schema";
+import { gearItems, NewPreset, NewPresetSetting, Preset, presets, PresetSetting, presetSettings } from "@/db/schema";
 import { and, asc, eq, isNull } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { getUserId } from "./auth";
 
-export async function addPreset(data: NewPreset) {
+export async function addPreset(data: any) {
+    const userId = await getUserId();
     try {
-        const presetId = await db.insert(presets).values(data).returning({ id: presets.id });
+        const presetId = await db.insert(presets).values({ ...data, userId: userId, createdBy: userId }).returning({ id: presets.id });
         return { id: presetId[0].id };
     } catch {
         return { error: 'Something went wrong' };
     }
 }
 
-export async function presetExists(userId: number, songId: number, loadoutId: number | null, name: string) {
+export async function presetExists(songId: number, loadoutId: number | null, name: string) {
+    const userId = await getUserId();
     try {
         if (loadoutId) {
             const preset = await db
@@ -74,7 +78,8 @@ export async function getSettings(presetId: number) {
     }
 }
 
-export async function getPresets(userId: number, songId: number, loadoutId: number | null) {
+export async function getPresets(songId: number, loadoutId: number | null) {
+    const userId = await getUserId();
     try {
         const items = await db
             .select()
@@ -91,20 +96,33 @@ export async function getPresets(userId: number, songId: number, loadoutId: numb
 }
 
 export async function deleteSetting(presetId: number, gearId: number) {
-    try {
+    const userId = await getUserId();
+    try {        
+        const [preset] = await db
+        .select({ songId: presets.songId })
+        .from(presets)
+        .where(and(eq(presets.id, presetId), eq(presets.userId, userId)));
         await db
             .delete(presetSettings)
             .where(and(
                 eq(presetSettings.presetId, presetId), 
                 eq(presetSettings.gearItemId, gearId))
             );
-    } catch (error) {
-        throw error;
+        if (preset) {
+            revalidatePath(`/dashboard/songs/${preset.songId}`);
+        }
+    } catch {
+        return { error: 'Something went wrong. '};
     }
 }
 
 export async function editSetting(newSettings: PresetSetting) {
+    const userId = await getUserId();
     try {
+        const [preset] = await db
+        .select({ songId: presets.songId })
+        .from(presets)
+        .where(and(eq(presets.id, newSettings.presetId), eq(presets.userId, userId)));
         await db
             .update(presetSettings)
             .set({ settings: newSettings.settings })
@@ -112,6 +130,32 @@ export async function editSetting(newSettings: PresetSetting) {
                 eq(presetSettings.presetId, newSettings.presetId), 
                 eq(presetSettings.gearItemId, newSettings.gearItemId))
             );
+        if (preset) {
+            revalidatePath(`/dashboard/songs/${preset.songId}`);
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function deletePreset(preset: Preset) {
+    const userId = await getUserId();
+    try {
+        await db
+            .delete(presets)
+            .where(and(eq(presets.id, preset.id), eq(presets.userId, userId)));
+    } catch {
+        return { error: 'Something went wrong. '};
+    }
+}
+
+export async function editPreset(presetId: number, name: string) {
+    const userId = await getUserId();
+    try {
+        await db
+            .update(presets)
+            .set({ name: name })
+            .where(and(eq(presets.id, presetId), eq(presets.userId, userId)));
     } catch (error) {
         throw error;
     }

@@ -4,8 +4,10 @@ import { db } from "@/db"
 import { gearItems, loadoutItems, loadouts, NewGearItem } from "@/db/schema"
 import { and, asc, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache";
+import { getUserId } from "./auth";
 
-export async function getGearItems(userId: number, loadoutId: number | null) {
+export async function getGearItems(loadoutId: number | null) {
+    const userId = await getUserId();
     try {
         if (loadoutId) {
             const items = await db
@@ -34,9 +36,10 @@ export async function getGearItems(userId: number, loadoutId: number | null) {
     }
 }
 
-export async function addGear(newGear: NewGearItem, loadoutId: number | null) {
+export async function addGear(newGear: any, loadoutId: number | null) {
+    const userId = await getUserId();
     try {
-        const gear = await db.insert(gearItems).values(newGear).returning({ id: gearItems.id });
+        const gear = await db.insert(gearItems).values({ ...newGear, userId: userId }).returning({ id: gearItems.id });
         if (loadoutId) {
             await db.insert(loadoutItems).values({ loadoutId: loadoutId, gearItemId: gear[0].id });
         }
@@ -46,7 +49,8 @@ export async function addGear(newGear: NewGearItem, loadoutId: number | null) {
     }
 }
 
-export async function updateGear(fields: any, gearId: number, userId: number) {
+export async function updateGear(fields: any, gearId: number) {
+    const userId = await getUserId();
     try {
         await db
             .update(gearItems)
@@ -58,7 +62,8 @@ export async function updateGear(fields: any, gearId: number, userId: number) {
     }
 }
 
-export async function deleteGear(gearId: number, userId: number) {
+export async function deleteGear(gearId: number) {
+    const userId = await getUserId();
     try {
         await db.delete(gearItems).where(and(eq(gearItems.userId, userId), eq(gearItems.id, gearId)));
     } catch (error) {
@@ -66,7 +71,8 @@ export async function deleteGear(gearId: number, userId: number) {
     }
 }
 
-export async function getGearById(gearId: number, userId: number) {
+export async function getGearById(gearId: number) {
+    const userId = await getUserId();
     try {
         const results = await db
             .select()

@@ -4,9 +4,11 @@ import { db } from "@/db";
 import { NewSong, Song, songs } from "@/db/schema";
 import { eq, and, sql, desc, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getUserId } from "./auth";
 
 
-export async function getSongs(userId: number) {
+export async function getSongs() {
+    const userId = await getUserId();
     try {
         const songsList = await db
             .select()
@@ -20,7 +22,8 @@ export async function getSongs(userId: number) {
     }
 }
 
-export async function getCurrentSongs(userId: number) {
+export async function getCurrentSongs() {
+    const userId = await getUserId();
     try {
         const currentSongs = await db
             .select()
@@ -38,7 +41,8 @@ export async function getCurrentSongs(userId: number) {
     }
 }
 
-export async function getSongById(songId: number, userId: number) {
+export async function getSongById(songId: number) {
+    const userId = await getUserId();
     try {
         const [song] = await db
             .select()
@@ -52,17 +56,18 @@ export async function getSongById(songId: number, userId: number) {
     }
 }
 
-export async function addSong(song: NewSong) {
+export async function addSong(song: any) {
+    const userId = await getUserId();
     try {
         const [dupe] = await db
             .select()
             .from(songs)
-            .where(and(eq(songs.title, song.title), eq(songs.artist, song.artist), eq(songs.userId, song.userId)))
+            .where(and(eq(songs.title, song.title), eq(songs.artist, song.artist), eq(songs.userId, userId)))
             .limit(1);
         if (dupe) {
             return { error: `The song "${song.title}" by ${song.artist} already exists in your library.` }
         }
-        await db.insert(songs).values(song);
+        await db.insert(songs).values({ ...song, userId: userId });
         revalidatePath('/dashboard/songs');
     } catch (error) {
         console.log('Failed to add song: ', error);
@@ -70,7 +75,8 @@ export async function addSong(song: NewSong) {
     }
 }
 
-export async function updateSong(fields: any, id: number, userId: number) {
+export async function updateSong(fields: any, id: number) {
+    const userId = await getUserId();
     try {
         if (fields?.title && fields?.artist) {
             const [dupe] = await db
@@ -93,7 +99,8 @@ export async function updateSong(fields: any, id: number, userId: number) {
     }
 }
 
-export async function deleteSong(id: number, userId: number) {
+export async function deleteSong(id: number) {
+    const userId = await getUserId();
     try {
         await db
             .delete(songs)

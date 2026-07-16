@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 
 
-export default function CreateForm({ userId }: { userId: number }) {
+export default function CreateForm() {
     const [open, setOpen] = useState(false);
     const form = useForm<SongFormValues>({
         resolver: zodResolver(songFormSchema),
@@ -25,8 +25,7 @@ export default function CreateForm({ userId }: { userId: number }) {
     });
 
     async function onSubmit(data: SongFormValues) {
-        const song: NewSong = { ...data, userId: userId };
-        const result = await addSong(song);
+        const result = await addSong(data);
 
         if (result?.error) {
             form.setError('root', {

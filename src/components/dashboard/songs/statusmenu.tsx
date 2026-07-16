@@ -13,7 +13,7 @@ import { Song } from "@/db/schema";
 export default function StatusMenu({ song }: { song: Song }) {
     return (
         <Select defaultValue={song.status} onValueChange={(value) => {
-            updateSong({status: value}, song.id, song.userId);
+            updateSong({status: value}, song.id);
         }}>
             <SelectTrigger>
                 <SelectValue />
