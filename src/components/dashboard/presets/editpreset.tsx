@@ -1,21 +1,20 @@
 'use client'
-import { getGearItems } from '@/app/actions/gear';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@/components/ui/command';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GearItem, NewPreset, NewPresetSetting, Preset } from '@/db/schema';
+import { GearItem, NewPresetSetting, Preset, PresetSetting } from '@/db/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef, useState, useTransition } from 'react';
+import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { GearSelectItem } from './gearselectitem';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { addPreset, addSettings, presetExists } from '@/app/actions/presets';
+import { addSettings, presetExists, updatePreset } from '@/app/actions/presets';
+import { PencilIcon } from 'lucide-react';
 
 const presetFormSchema = z.object({
     name: z.string(),
@@ -23,68 +22,44 @@ const presetFormSchema = z.object({
     presetSettings: z.array(z.object({
       gearItemId: z.number(),
       settings: z.string().min(1, "Setting cannot be empty"),
-    })).min(1, "Must select at least one gear item."),
+    })),
 });
 
-export default function CreateForm({ songId, loadouts }: { songId: number, loadouts: { id: number | null, name: string }[] }) {
+export default function EditPresetForm({ preset, settings, loadoutItems }: { 
+    preset: Preset,
+    settings: PresetSetting[],
+    loadoutItems: GearItem[],
+}) {
     const [page, setPage] = useState({ open: false, step: 1 });
-    const [gear, setGear] = useState<GearItem[]>([]);
-    const [isPending, startTransition] = useTransition();
 
+    const gear = loadoutItems.filter(g => !settings.some(s => s.gearItemId === g.id));
 
-    //FLOW: user selects loadout -> loads all gear -> user selects gear -> updates presetSettings[] -> next page allows settings logging
-
-    //RHF form
     const form = useForm<z.infer<typeof presetFormSchema>>({
         resolver: zodResolver(presetFormSchema),
         defaultValues: {
-            name: "",
-            loadoutId: null,
+            name: preset.name ?? 'Main',
+            loadoutId: preset.loadoutId,
             presetSettings: [],
         },
     });
 
-    //Controls the presetSettings array
-    const { fields, append, remove, replace } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: 'presetSettings',
     });
 
-    //handles data fetching on loadout change
-    const requestId = useRef(0);
-    function handleLoadoutChange(loadoutId: number | null) {
-        const id = ++requestId.current;
-        startTransition(async () => {
-            const items = await getGearItems(loadoutId);
-            if (id === requestId.current) {
-                setGear(items);
-            }
-        });
-        replace([]);
-    }
-
-    //handles form submit
     async function onSubmit(data: z.infer<typeof presetFormSchema>) {
-        const preset = { 
-            songId: songId, 
-            createdAt: new Date(),
-            name: data.name === "" ? "Main" : data.name,
-            updatedAt: new Date(),
-            loadoutId: data.loadoutId,
-            isPublic: false,
-        };
-        const addedPreset = await addPreset(preset);
-        if (addedPreset.error) {
+        const addedPreset = await updatePreset(preset.id, preset.songId, data.name === "" ? "Main" : data.name);
+        if (addedPreset?.error) {
             form.setError('root', {
                 type: 'manual',
                 message: addedPreset.error,
             });
             return;
         }
-
         const settings: NewPresetSetting[] = data.presetSettings.map((s) => ({
             ...s,
-            presetId: addedPreset.id!!,
+            presetId: preset.id,
         }));
         const result = await addSettings(settings);
         if (result?.error) {
@@ -101,24 +76,27 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
     return (
         <Dialog open={page.open} onOpenChange={(nextOpen) => {
             setPage({ open: nextOpen, step: 1 });
-            if (!nextOpen) {
-                form.reset();
-                setPage({ open: false, step: 1 });
-                setGear([]);
-            } else {
-                handleLoadoutChange(null);
+            if (nextOpen) {
+                form.reset({
+                    name: preset.name ?? 'Main',
+                    loadoutId: preset.loadoutId,
+                    presetSettings: [],
+                });
             }
         }}>
-            <form id="create-preset" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id={`edit-preset-${preset.id}`} onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Add Preset</Button>
+                    <Button variant="outline">
+                        <PencilIcon />
+                        Edit
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>Add Preset</DialogTitle>
+                        <DialogTitle>Edit Preset</DialogTitle>
                         {page.step === 1 &&
                             <DialogDescription>
-                                Select the gear you will be using
+                                Change name and add additional gear from the loadout
                             </DialogDescription>
                         }
                         {page.step === 2 &&
@@ -135,48 +113,16 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor="create-preset-name">
+                                        <FieldLabel htmlFor={`edit-preset-name-${preset.id}`}>
                                             Name
                                         </FieldLabel>
                                         <Input
                                             {...field}
-                                            id="create-preset-name"
+                                            id={`edit-preset-name-${preset.id}`}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
                                             placeholder='"Main" if left blank'
                                         />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                            <Controller
-                                name="loadoutId"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor="create-preset-loadout">
-                                            Loadout
-                                        </FieldLabel>
-                                        <Select
-                                            value={field.value === null ? 'main' : String(field.value)}
-                                            onValueChange={(value) => {
-                                                field.onChange(value === 'main' ? null : Number(value));
-                                                handleLoadoutChange(value === 'main' ? null : Number(value));
-                                            }}
-                                        >
-                                            <SelectTrigger id="create-preset-loadout">
-                                                <SelectValue placeholder="Select a loadout" />
-                                            </SelectTrigger>
-                                            <SelectContent position="popper">
-                                                <SelectGroup>
-                                                    {loadouts.map((loadout) => (
-                                                        <SelectItem key={loadout.id ?? 'main'} value={loadout.id === null ? 'main' : String(loadout.id)}>{loadout.name}</SelectItem>
-                                                    ))}
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
                                         )}
@@ -195,11 +141,16 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                                 className="mb-2 data-[invalid=true]:text-destructive"
                                                 data-invalid={fieldState.invalid}
                                             >
-                                                Select Gear
+                                                Select Additional Gear
                                             </FieldLabel>
                                             <CommandInput placeholder="Search for gear..." />
                                             <CommandList>
-                                                <CommandEmpty>No results found.</CommandEmpty>
+                                                {gear.length === 0 && (
+                                                    <CommandEmpty>All gear in the loadout has been used.</CommandEmpty>
+                                                )}
+                                                {gear.length !== 0 && (
+                                                    <CommandEmpty>No results found.</CommandEmpty>
+                                                )}
                                                 <CommandGroup heading="Guitars">
                                                     {gear.filter((g) => g.type === 'guitar').map((item) => (
                                                         <GearSelectItem
@@ -250,6 +201,9 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
 
                     {page.step === 2 &&
                         <ScrollArea className="h-72">
+                            {fields.length === 0 && (
+                                <p>No additional gear selected.</p>
+                            )}
                             {fields.map((item, index) => {
                                 const gearItem = gear.find(g => g.id === item.gearItemId)
                                 return (
@@ -259,12 +213,12 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                         control={form.control}
                                         render={({ field, fieldState }) => (
                                             <Field data-invalid={fieldState.invalid}>
-                                                <FieldLabel className="mt-2" htmlFor={`presetSettings.${index}.settings`}>
+                                                <FieldLabel className="mt-2" htmlFor={`edit-preset-${preset.id}-presetSettings.${index}.settings`}>
                                                     {gearItem?.name ?? 'Unknown Gear'}
                                                 </FieldLabel>
                                                 <Textarea
                                                     {...field}
-                                                    id={`presetSettings.${index}.settings`}
+                                                    id={`edit-preset-${preset.id}-presetSettings.${index}.settings`}
                                                     aria-invalid={fieldState.invalid}
                                                     autoComplete="off"
                                                     value={field.value ?? ""}
@@ -289,22 +243,12 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
                         {page.step === 2 &&
-                            <Button type="submit" form="create-preset">Add</Button>
+                            <Button type="submit" form="edit-preset">Update</Button>
                         }
                         {page.step === 1 &&
                             <Button type="button" onClick={async () => {
-                                const { name, loadoutId, presetSettings } = form.getValues();
-                                const valid = presetSettings.length > 0;
-                                console.log('valid?');
-                                if (!valid) {
-                                    console.log('Not valid');
-                                    form.setError('presetSettings', {
-                                        type: 'manual',
-                                        message: "Must select at least one gear item",
-                                    });
-                                    return;
-                                }
-                                const exists = await presetExists(songId, loadoutId, name);
+                                const { name, loadoutId} = form.getValues();
+                                const exists = await presetExists(preset.songId, loadoutId, name, preset.id);
                                 if (exists) {
                                     form.setError('name', {
                                         type: 'manual',

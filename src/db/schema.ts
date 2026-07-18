@@ -278,12 +278,3 @@ export const gearFormSchema = gearSchema
     }),
 });
 export type GearFormValues = z.infer<typeof gearFormSchema>;
-
-export const presetFormSchema = z.object({
-  name: z.string(),
-  loadoutId: z.number().nullable(),
-  presetSettings: z.array(z.object({
-    gearItemId: z.number(),
-    settings: z.string().min(1, "Setting cannot be empty"),
-  })).min(1, "Must select at least one gear item."),
-});

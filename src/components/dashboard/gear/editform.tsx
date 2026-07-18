@@ -48,7 +48,7 @@ export default function EditForm({ gear }: { gear: GearItem }) {
                 form.reset();
             }
         }}>
-            <form id="edit-gear" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id={`edit-gear-${gear.id}`} onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogTrigger asChild>
                     <Button variant="outline" size="icon">
                         <PencilIcon />
@@ -68,12 +68,12 @@ export default function EditForm({ gear }: { gear: GearItem }) {
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="edit-gear-name">
+                                    <FieldLabel htmlFor={`edit-gear-name-${gear.id}`}>
                                         Name
                                     </FieldLabel>
                                     <Input
                                         {...field}
-                                        id="edit-gear-name"
+                                        id={`edit-gear-name-${gear.id}`}
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                     />
@@ -88,13 +88,13 @@ export default function EditForm({ gear }: { gear: GearItem }) {
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="edit-gear-notes">
+                                    <FieldLabel htmlFor={`edit-gear-notes-${gear.id}`}>
                                         Notes
                                     </FieldLabel>
-                                    <Textarea 
+                                    <Textarea
                                         {...field}
                                         value={field.value ?? ""}
-                                        id="edit-gear-notes" 
+                                        id={`edit-gear-notes-${gear.id}`}
                                         aria-invalid={fieldState.invalid}
                                         placeholder="Knobs, switches, etc..."
                                         autoComplete="off"
@@ -110,11 +110,11 @@ export default function EditForm({ gear }: { gear: GearItem }) {
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="edit-gear-type">
-                                        Status
+                                    <FieldLabel htmlFor={`edit-gear-type-${gear.id}`}>
+                                        Type
                                     </FieldLabel>
                                     <Select value={field.value ?? undefined} onValueChange={field.onChange}>
-                                        <SelectTrigger id="edit-gear-type">
+                                        <SelectTrigger id={`edit-gear-type-${gear.id}`}>
                                             <SelectValue/>
                                         </SelectTrigger>
                                         <SelectContent position="popper">
@@ -141,7 +141,7 @@ export default function EditForm({ gear }: { gear: GearItem }) {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" form="edit-gear">Update</Button>
+                        <Button type="submit" form={`edit-gear-${gear.id}`}>Update</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

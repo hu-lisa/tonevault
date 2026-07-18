@@ -1,11 +1,16 @@
-import { getGearById } from "@/app/actions/gear";
+'use client'
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { PresetSetting } from "@/db/schema";
-import { EllipsisVertical } from 'lucide-react';
+import { EllipsisVertical, PencilIcon, Trash } from 'lucide-react';
+import { useState } from "react";
+import EditSettingsDialog from "./editsettings";
+import DeleteSettingsDialog from "./deletesettings";
 
-export function SettingsCard({ setting }: { setting: any }) {
+export function SettingsCard({ setting }: { setting: { presetId: number; gearItemId: number; settings: string; name: string; } }) {
+    const [editOpen, setEditOpen] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+
     return (
         <Card className="w-64 shrink-0 gap-2 shadow-none ring-0">
             <CardHeader className="flex flex-row items-center gap-2 space-y-0 justify-between">
@@ -19,8 +24,23 @@ export function SettingsCard({ setting }: { setting: any }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={(e) => {
+                                    e.preventDefault();
+                                    setEditOpen(true);
+                                }}>
+                                    <PencilIcon />
+                                    Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-destructive"
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        setDeleteOpen(true);
+                                    }}
+                                >
+                                    <Trash />
+                                    Delete
+                                </DropdownMenuItem>
                             </DropdownMenuGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -31,6 +51,17 @@ export function SettingsCard({ setting }: { setting: any }) {
                     {setting.settings}
                 </p>
             </CardContent>
+            <EditSettingsDialog
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                setting={setting}
+            />
+            <DeleteSettingsDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                gearId={setting.gearItemId}
+                presetId={setting.presetId}
+            />
         </Card>
     )
 }

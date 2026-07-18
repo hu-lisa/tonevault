@@ -1,38 +1,44 @@
 'use client'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { deleteGear } from "@/app/actions/gear";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { useState } from "react";
-import { deleteSetting } from "@/app/actions/presets";
+import { Trash } from "lucide-react"
+import { deletePreset } from "@/app/actions/presets";
+import { Preset } from "@/db/schema";
 
-export default function DeleteSettingsDialog({ open, onOpenChange, gearId, presetId }: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    gearId: number;
-    presetId: number;
-}) {
+export default function DeletePresetDialog({ preset }: { preset: Preset }) {
+    const [open, setOpen] = useState(false);
     const [deleteError, setDeleteError] = useState<{ message: string } | null>(null);
 
     async function handleDelete() {
-        const result = await deleteSetting(presetId, gearId);
+        const result = await deletePreset(preset)
         if (result?.error) {
             setDeleteError({ message: result.error });
             return;
         }
-        onOpenChange(false);
+        setOpen(false);
         setDeleteError(null);
     }
     return (
         <AlertDialog open={open} onOpenChange={(nextOpen) => {
-            onOpenChange(nextOpen);
+            setOpen(nextOpen);
             if(!nextOpen) {
                 setDeleteError(null);
             }
         }}>
+            <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                    <Trash />
+                    Delete
+                </Button>
+            </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will delete the gear and its settings from your preset.
+                        This will delete the preset and all its settings.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -44,8 +50,8 @@ export default function DeleteSettingsDialog({ open, onOpenChange, gearId, prese
                         Continue
                     </AlertDialogAction>
                 </AlertDialogFooter>
-                {deleteError && <FieldError errors={[deleteError]} />}
             </AlertDialogContent>
+            {deleteError && <FieldError errors={[deleteError]} />}
         </AlertDialog>
     )
 }
