@@ -45,9 +45,9 @@ export async function presetExists(songId: number, loadoutId: number | null, nam
 
 export async function addSettings(settings: NewPresetSetting[]) {
     try {
-        await settings.map(async (s) =>
+        await Promise.all(settings.map(async (s) =>
             await db.insert(presetSettings).values(s)
-        );
+        ));
         return;
     } catch {
         return { error: 'Something went wrong.' };

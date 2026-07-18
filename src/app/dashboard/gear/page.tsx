@@ -11,14 +11,13 @@ const types = [
 ];
 
 export default async function Page() {
-    const userId = await getUserId();
-    const items = await getGearItems(userId);
+    const items = await getGearItems(null);
 
     return (
         <div className="flex flex-col space-y-2">
             <div className="flex flex-row items-center justify-between">
                 <header className='text-2xl'>Gear</header>
-                <CreateForm userId={userId}/>
+                <CreateForm/>
             </div>
             <div>
                 <Tabs defaultValue="guitar">
@@ -32,7 +31,7 @@ export default async function Page() {
                         <TabsContent key={type.value} value={type.value}>
                             <div className="grid grid-cols-3 space-x-2 space-y-2">
                                 {items.filter(item => (item.type === type.value)).map((gear) => (
-                                    <GearCard gear={gear} userId={userId} key={gear.id} />
+                                    <GearCard gear={gear} key={gear.id} />
                                 ))}
                             </div>
                         </TabsContent>
