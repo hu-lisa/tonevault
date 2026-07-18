@@ -7,7 +7,8 @@ import { AuthError } from "next-auth";
 import bcrypt from 'bcrypt';
 import { logOut } from "./login";
 
-export async function getEmail(id: number) {
+export async function getEmail() {
+    const id = await getUserId();
     try {
         const [result] = await db
             .select({ email: users.email })
@@ -20,7 +21,8 @@ export async function getEmail(id: number) {
     }
 }
 
-export async function updatePassword(id: number, password: string) {
+export async function updatePassword(password: string) {
+    const id = await getUserId();
     try {
         const newHash = await bcrypt.hash(password, 12);
         await db.update(users).set({ passwordHash: newHash }).where(eq(users.id, id));
@@ -30,9 +32,9 @@ export async function updatePassword(id: number, password: string) {
 }
 
 
-export async function validate(id: number, password: string) {
+export async function validate(password: string) {
     try {
-        const email = await getEmail(id);
+        const email = await getEmail();
         await signIn('credentials', {
             email,
             password,
@@ -51,7 +53,8 @@ export async function validate(id: number, password: string) {
     }
 }
 
-export async function deleteUser(id: number) {
+export async function deleteUser() {
+    const id = await getUserId();
     try {
         await db.delete(users).where(eq(users.id, id));
         await logOut();

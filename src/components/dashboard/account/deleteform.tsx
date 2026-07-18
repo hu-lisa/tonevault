@@ -15,7 +15,7 @@ const formSchema = z.object({
     password: z.string().min(6, 'Password is at least 6 characters.'),
 });
 
-export default function DeleteForm({ userId }: { userId: number }) {
+export default function DeleteForm() {
     const [open, setOpen] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -25,7 +25,7 @@ export default function DeleteForm({ userId }: { userId: number }) {
     });
 
     async function onSubmit(data: z.infer<typeof formSchema>) {
-        const result = await validate(userId, data.password);
+        const result = await validate(data.password);
 
         if (result?.error) {
             form.setError('root', {
@@ -35,7 +35,7 @@ export default function DeleteForm({ userId }: { userId: number }) {
             return;
         }
 
-        const erase = await deleteUser(userId);
+        const erase = await deleteUser();
 
         if (erase?.error) {
             form.setError('root', {

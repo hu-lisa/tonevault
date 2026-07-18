@@ -14,7 +14,7 @@ import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 
 
-export default function EditForm({ userId, song }: { userId: number, song: Song }) {
+export default function EditForm({ song }: { song: Song }) {
     const [open, setOpen] = useState(false);
     const form = useForm<SongFormValues>({
         resolver: zodResolver(songFormSchema),
@@ -26,7 +26,7 @@ export default function EditForm({ userId, song }: { userId: number, song: Song 
     });
 
     async function onSubmit(data: SongFormValues) {
-        const result = await updateSong(data, song.id, userId);
+        const result = await updateSong(data, song.id);
 
         if (result?.error) {
             form.setError('root', {

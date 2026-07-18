@@ -3,14 +3,14 @@ import { GearItem } from "@/db/schema";
 import EditForm from "./editform";
 import DeleteButton from "./deleteform";
 
-export default function GearCard({ gear, userId }: { gear: GearItem, userId: number }) {
+export default function GearCard({ gear }: { gear: GearItem }) {
     return (
         <Card>
             <CardHeader>
                 <CardTitle>{gear.name}</CardTitle>
                 <CardAction className="flex flex-row">
-                    <EditForm gear={gear} userId={userId} />
-                    <DeleteButton gearId={gear.id} userId={userId} />
+                    <EditForm gear={gear} />
+                    <DeleteButton gearId={gear.id} />
                 </CardAction>
             </CardHeader>
             <CardContent>

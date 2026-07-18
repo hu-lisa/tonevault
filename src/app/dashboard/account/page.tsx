@@ -9,16 +9,15 @@ import { Separator } from "@/components/ui/separator";
 
 
 export default async function Page() {
-    const userId = await getUserId();
-    const email = await getEmail(userId);
+    const email = await getEmail();
     return (
         <div className="flex flex-col space-y-2">
             <header className="text-2xl">Profile</header>
             <AccountPanel email={email} />
             <Separator />
             <div className="flex flex-row-reverse space-x-2">
-                <DeleteForm userId={userId} />
-                <PasswordForm userId={userId} />
+                <DeleteForm />
+                <PasswordForm />
             </div>
         </div>
     )

@@ -1,40 +1,38 @@
 'use client'
-import { deleteSong } from "@/app/actions/songs";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FieldError } from "@/components/ui/field";
-import { redirect } from "next/navigation";
 import { useState } from "react";
+import { deleteSetting } from "@/app/actions/presets";
 
-export default function DeleteButton({ songId }: { songId: number }) {
-    const [open, setOpen] = useState(false);
+export default function DeleteSettingsDialog({ open, onOpenChange, gearId, presetId }: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    gearId: number;
+    presetId: number;
+}) {
     const [deleteError, setDeleteError] = useState<{ message: string } | null>(null);
 
     async function handleDelete() {
-        const result = await deleteSong(songId);
+        const result = await deleteSetting(presetId, gearId);
         if (result?.error) {
             setDeleteError({ message: result.error });
             return;
         }
-        setOpen(false);
+        onOpenChange(false);
         setDeleteError(null);
-        redirect('/dashboard/songs');
     }
     return (
         <AlertDialog open={open} onOpenChange={(nextOpen) => {
-            setOpen(nextOpen);
+            onOpenChange(nextOpen);
             if(!nextOpen) {
                 setDeleteError(null);
             }
         }}>
-            <AlertDialogTrigger asChild>
-                <Button variant="destructive">Delete</Button>
-            </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the song and its presets.
+                        This will delete the gear and its settings from your preset.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -46,8 +44,8 @@ export default function DeleteButton({ songId }: { songId: number }) {
                         Continue
                     </AlertDialogAction>
                 </AlertDialogFooter>
+                {deleteError && <FieldError errors={[deleteError]} />}
             </AlertDialogContent>
-            {deleteError && <FieldError errors={[deleteError]} />}
         </AlertDialog>
     )
 }

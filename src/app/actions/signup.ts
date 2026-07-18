@@ -4,11 +4,12 @@ import { z } from 'zod';
 import { getUser, signIn } from './auth';
 import bcrypt from 'bcrypt';
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { loadouts, users } from '@/db/schema';
 import { AuthError } from 'next-auth';
 
 export async function signup({ email, password }: { email: string, password: string }) {
 
+    //check if user already exists
     const existingUser = await getUser(email);
     if (existingUser) {
         return { errors: 'User already exists. Please use the login page.' };
@@ -16,6 +17,7 @@ export async function signup({ email, password }: { email: string, password: str
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    //attempt insert into users table
     try {
         await db.insert(users).values({ email, passwordHash });
     } catch {

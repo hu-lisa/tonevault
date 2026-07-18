@@ -7,12 +7,12 @@ import { redirect } from "next/navigation";
 import { useState } from "react";
 import { Trash } from "lucide-react"
 
-export default function DeleteButton({ gearId, userId }: { gearId: number, userId: number }) {
+export default function DeleteButton({ gearId }: { gearId: number }) {
     const [open, setOpen] = useState(false);
     const [deleteError, setDeleteError] = useState<{ message: string } | null>(null);
 
     async function handleDelete() {
-        const result = await deleteGear(gearId, userId);
+        const result = await deleteGear(gearId);
         if (result?.error) {
             setDeleteError({ message: result.error });
             return;

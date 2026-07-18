@@ -1,24 +1,25 @@
 'use client'
-import { deleteSong } from "@/app/actions/songs";
+import { deleteGear } from "@/app/actions/gear";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
-import { redirect } from "next/navigation";
 import { useState } from "react";
+import { Trash } from "lucide-react"
+import { deletePreset } from "@/app/actions/presets";
+import { Preset } from "@/db/schema";
 
-export default function DeleteButton({ songId }: { songId: number }) {
+export default function DeletePresetDialog({ preset }: { preset: Preset }) {
     const [open, setOpen] = useState(false);
     const [deleteError, setDeleteError] = useState<{ message: string } | null>(null);
 
     async function handleDelete() {
-        const result = await deleteSong(songId);
+        const result = await deletePreset(preset)
         if (result?.error) {
             setDeleteError({ message: result.error });
             return;
         }
         setOpen(false);
         setDeleteError(null);
-        redirect('/dashboard/songs');
     }
     return (
         <AlertDialog open={open} onOpenChange={(nextOpen) => {
@@ -28,13 +29,16 @@ export default function DeleteButton({ songId }: { songId: number }) {
             }
         }}>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive">Delete</Button>
+                <Button variant="destructive">
+                    <Trash />
+                    Delete
+                </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the song and its presets.
+                        This will delete the preset and all its settings.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
