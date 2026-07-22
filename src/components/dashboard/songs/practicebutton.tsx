@@ -2,7 +2,6 @@
 
 import { updateSong } from "@/app/actions/songs"
 import { Button } from "@/components/ui/button"
-import { revalidatePath } from "next/cache";
 
 export default function PracticeButton({ songId }: {songId: number }) {
     async function handlePractice() {

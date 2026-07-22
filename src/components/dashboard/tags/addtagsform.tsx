@@ -3,9 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandItem, CommandGroup, CommandInput, CommandList } from '@/components/ui/command';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tag } from '@/db/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -81,7 +78,7 @@ export default function AddTagsForm({ songId, tagLib }: {
                 <DialogTrigger asChild>
                     <Button variant="outline">Add Tags</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add Tags</DialogTitle>
                         <DialogDescription>

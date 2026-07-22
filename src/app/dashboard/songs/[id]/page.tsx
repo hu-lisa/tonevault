@@ -1,4 +1,3 @@
-import { getUserId } from "@/app/actions/auth";
 import { getLoadouts } from "@/app/actions/loadouts";
 import { getPresets } from "@/app/actions/presets";
 import { getSongById } from "@/app/actions/songs";
@@ -56,9 +55,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <div className="flex flex-row items-center gap-2">
                 <ScrollArea className="w-fit max-w-1/2 min-w-0 whitespace-nowrap">
                     <div className="flex flex-row items-stretch gap-3 py-2">
-                        {tags.map((tag) => (
+                        {tags.length > 0 ? tags.map((tag) => (
                             <TagChip key={tag.id} tag={tag} songId={songId} />
-                        ))}
+                        )) : <p className="text-sm">No tags added</p>}
                     </div>
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>
@@ -76,9 +75,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <header className="text-2xl">Presets</header>
                     <CreateForm songId={songId} loadouts={[{ id: null, name: 'Main' }, ...loadouts]}/>
                 </div>
-                {presets.map((p) => (
+                {presets.length > 0 ? presets.map((p) => (
                     <PresetCard key={p.id} preset={p} />
-                ))}
+                )) : <p className="text-sm text-center">No presets yet.</p>}
             </div>
         </div>
     )

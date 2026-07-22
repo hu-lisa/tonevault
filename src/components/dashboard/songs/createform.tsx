@@ -1,6 +1,5 @@
 'use client'
 
-import { NewSong } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
 import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -14,7 +14,7 @@ export default function SideNav() {
 
     return (
         <Sidebar collapsible="none" className="h-screen">
-        <SidebarHeader>Menu</SidebarHeader>
+        <SidebarHeader className="px-2 text-lg font-semibold">ToneVault</SidebarHeader>
         <SidebarContent>
             <SidebarGroup>
                 <SidebarMenu>

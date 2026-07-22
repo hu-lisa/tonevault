@@ -1,17 +1,15 @@
 'use client'
 
-import { gearFormSchema, GearFormValues, GearItem, NewGearItem, NewSong } from "@/db/schema";
+import { gearFormSchema, GearFormValues, GearItem } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
-import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { addSong } from "@/app/actions/songs";
 import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
-import { addGear, updateGear } from "@/app/actions/gear";
+import { updateGear } from "@/app/actions/gear";
 import { Textarea } from "@/components/ui/textarea";
 import { PencilIcon } from "lucide-react";
 

@@ -83,6 +83,7 @@ export default function PasswordForm() {
                                         id="old-pw"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
+                                        type="password"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -103,6 +104,7 @@ export default function PasswordForm() {
                                         id="new-pw"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
+                                        type="password"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />

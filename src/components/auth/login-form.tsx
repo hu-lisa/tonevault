@@ -18,8 +18,7 @@ export default function LoginForm() {
     return (
         <div className="flex h-screen items-center justify-center">
             <form action={formAction} noValidate={true}>
-                <Card>
-
+                <Card className="w-72 sm:max-w-sm">
                     <CardHeader>
                         <CardTitle>Login to your account</CardTitle>
                         <CardDescription>

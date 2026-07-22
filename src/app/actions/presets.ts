@@ -13,12 +13,17 @@ export async function addPreset(data: {
     updatedAt: Date;
     loadoutId: number | null;
     isPublic: boolean;
-}) {
+}, settings: { gearItemId: number, settings: string }[]) {
     const userId = await getUserId();
     try {
-        const presetId = await db.insert(presets).values({ ...data, userId: userId, createdBy: userId }).returning({ id: presets.id });
+        await db.transaction( async(tx) => {
+            const [preset] = await tx.insert(presets).values({ ...data, userId: userId, createdBy: userId }).returning({ id: presets.id });
+
+            await tx.insert(presetSettings).values(
+                settings.map((s) => ({ gearItemId: s.gearItemId, settings: s.settings, presetId: preset.id}))
+            );
+        });
         revalidatePath(`/dashboard/songs/${data.songId}`);
-        return { id: presetId[0].id };
     } catch {
         return { error: 'Something went wrong' };
     }
@@ -148,13 +153,26 @@ export async function deletePreset(preset: Preset) {
     }
 }
 
-export async function updatePreset(presetId: number, songId: number, name: string) {
+export async function updatePreset(
+    presetId: number, 
+    songId: number, 
+    name: string,
+    settings: { gearItemId: number, settings: string }[]
+) {
     const userId = await getUserId();
     try {
-        await db
-            .update(presets)
-            .set({ name: name })
-            .where(and(eq(presets.id, presetId), eq(presets.userId, userId)));
+        await db.transaction(async(tx) => {
+                await tx
+                .update(presets)
+                .set({ name: name })
+                .where(and(eq(presets.id, presetId), eq(presets.userId, userId)));
+                if (settings.length > 0) {
+                    await tx.insert(presetSettings).values(
+                        settings.map((s) => ({ gearItemId: s.gearItemId, settings: s.settings, presetId: presetId}))
+                    )
+                }
+            }
+        );
         revalidatePath(`/dashboard/songs/${songId}`);
     } catch {
         return { error: 'Something went wrong.' };

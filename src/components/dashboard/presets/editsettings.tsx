@@ -2,7 +2,7 @@
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,7 +49,6 @@ export default function EditSettingsDialog({ open, onOpenChange, setting }: {
         <Dialog open={open} onOpenChange={(nextOpen) => {
             onOpenChange(nextOpen);
             if (nextOpen) {
-                console.log(`Selected gear item ${setting.gearItemId}`);
                 form.reset();
             }
         }}>

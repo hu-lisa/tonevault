@@ -5,8 +5,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GearItem, NewPreset, NewPresetSetting, Preset } from '@/db/schema';
+import { GearItem } from '@/db/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef, useState, useTransition } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -15,7 +14,7 @@ import { GearSelectItem } from './gearselectitem';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { addPreset, addSettings, presetExists } from '@/app/actions/presets';
+import { addPreset, presetExists } from '@/app/actions/presets';
 
 const presetFormSchema = z.object({
     name: z.string(),
@@ -73,20 +72,8 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
             loadoutId: data.loadoutId,
             isPublic: false,
         };
-        const addedPreset = await addPreset(preset);
-        if (addedPreset.error) {
-            form.setError('root', {
-                type: 'manual',
-                message: addedPreset.error,
-            });
-            return;
-        }
+        const result = await addPreset(preset, data.presetSettings);
 
-        const settings: NewPresetSetting[] = data.presetSettings.map((s) => ({
-            ...s,
-            presetId: addedPreset.id!!,
-        }));
-        const result = await addSettings(settings);
         if (result?.error) {
             form.setError('root', {
                 type: 'manual',
@@ -113,7 +100,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                 <DialogTrigger asChild>
                     <Button variant="outline">Add Preset</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add Preset</DialogTitle>
                         {page.step === 1 &&
@@ -151,7 +138,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                     </Field>
                                 )}
                             />
-                            <Controller
+                            {/*<Controller
                                 name="loadoutId"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
@@ -182,7 +169,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                         )}
                                     </Field>
                                 )}
-                            />
+                            />*/}
 
                             <Controller
                                 name="presetSettings"
@@ -283,7 +270,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
 
                     <DialogFooter>
                         {page.step === 2 &&
-                            <Button className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
+                            <Button variant="outline" className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
                         }
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
@@ -295,9 +282,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                             <Button type="button" onClick={async () => {
                                 const { name, loadoutId, presetSettings } = form.getValues();
                                 const valid = presetSettings.length > 0;
-                                console.log('valid?');
                                 if (!valid) {
-                                    console.log('Not valid');
                                     form.setError('presetSettings', {
                                         type: 'manual',
                                         message: "Must select at least one gear item",

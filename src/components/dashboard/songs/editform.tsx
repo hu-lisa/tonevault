@@ -1,6 +1,6 @@
 'use client'
 
-import { NewSong, Song } from "@/db/schema";
+import { Song } from "@/db/schema";
 import { Controller, useForm } from "react-hook-form";
 import { SongFormValues, songFormSchema } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,10 +8,8 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { addSong, updateSong } from "@/app/actions/songs";
-import { redirect } from "next/navigation";
+import { updateSong } from "@/app/actions/songs";
 import { useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 
 
 export default function EditForm({ song }: { song: Song }) {

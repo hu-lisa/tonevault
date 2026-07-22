@@ -83,6 +83,7 @@ export default function DeleteForm() {
                                         id="delete-pw"
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
+                                        type="password"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
