@@ -101,7 +101,7 @@ export const songs = pgTable("songs", {
     .notNull(),
   status: varchar({ enum: ['want_to_learn', 'currently_learning', 'learned'] })
     .notNull(),
-  source_link: text(),
+  sourceLink: text(),
   lastPracticedAt: timestamp({mode: 'date'}),
   createdAt: timestamp({mode: 'date'})
     .defaultNow()
@@ -115,6 +115,7 @@ export const songs = pgTable("songs", {
 ]);
 export type Song = typeof songs.$inferSelect;
 export type NewSong = typeof songs.$inferInsert;
+export type SongWithTags = Song & { tags: Tag[] };
 
 export const tags = pgTable("tags", {
   id: integer()

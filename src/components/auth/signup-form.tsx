@@ -37,9 +37,9 @@ export default function SignUpForm() {
     }
 
     return (
-        <div className="items-center">
+        <div className="flex h-screen items-center justify-center">
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate={true}>
-                <Card className="w-full">
+                <Card className="w-72 sm:max-w-sm">
                     <CardHeader>
                         <CardTitle>Create an Account</CardTitle>
                         <CardDescription>
@@ -81,6 +81,7 @@ export default function SignUpForm() {
                                             id="signup-password"
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
+                                            type="password"
                                         />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />

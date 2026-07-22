@@ -113,7 +113,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                 <DialogTrigger asChild>
                     <Button variant="outline">Add Preset</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add Preset</DialogTitle>
                         {page.step === 1 &&
@@ -151,7 +151,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                     </Field>
                                 )}
                             />
-                            <Controller
+                            {/*<Controller
                                 name="loadoutId"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
@@ -182,7 +182,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
                                         )}
                                     </Field>
                                 )}
-                            />
+                            />*/}
 
                             <Controller
                                 name="presetSettings"
@@ -283,7 +283,7 @@ export default function CreateForm({ songId, loadouts }: { songId: number, loado
 
                     <DialogFooter>
                         {page.step === 2 &&
-                            <Button className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
+                            <Button variant="outline" className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
                         }
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>

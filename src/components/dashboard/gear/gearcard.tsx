@@ -8,7 +8,7 @@ export default function GearCard({ gear }: { gear: GearItem }) {
         <Card>
             <CardHeader>
                 <CardTitle>{gear.name}</CardTitle>
-                <CardAction className="flex flex-row">
+                <CardAction className="flex flex-row gap-2">
                     <EditForm gear={gear} />
                     <DeleteButton gearId={gear.id} />
                 </CardAction>

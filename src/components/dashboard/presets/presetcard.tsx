@@ -21,7 +21,7 @@ export async function PresetCard({ preset }: { preset: Preset }) {
                 </CardAction>
             </CardHeader>
             <CardContent className="min-w-0">
-                <ScrollArea>
+                <ScrollArea className="w-full min-w-0">
                     <div className="flex flex-row items-stretch gap-3 pb-2">
                         {settings.map((setting) => (
                             <SettingsCard key={setting.gearItemId} setting={setting} />

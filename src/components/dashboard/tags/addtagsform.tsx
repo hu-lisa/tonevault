@@ -81,7 +81,7 @@ export default function AddTagsForm({ songId, tagLib }: {
                 <DialogTrigger asChild>
                     <Button variant="outline">Add Tags</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add Tags</DialogTitle>
                         <DialogDescription>

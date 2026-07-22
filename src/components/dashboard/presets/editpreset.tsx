@@ -91,7 +91,7 @@ export default function EditPresetForm({ preset, settings, loadoutItems }: {
                         Edit
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Edit Preset</DialogTitle>
                         {page.step === 1 &&
@@ -237,7 +237,7 @@ export default function EditPresetForm({ preset, settings, loadoutItems }: {
 
                     <DialogFooter>
                         {page.step === 2 &&
-                            <Button className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
+                            <Button variant="outline" className="mr-auto" onClick={() => setPage({ open: true, step: 1 })}>Back</Button>
                         }
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>

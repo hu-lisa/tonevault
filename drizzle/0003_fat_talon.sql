@@ -1,0 +1,1 @@
+ALTER TABLE "songs" RENAME COLUMN "source_link" TO "sourceLink";

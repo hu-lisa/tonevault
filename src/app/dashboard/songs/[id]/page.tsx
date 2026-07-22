@@ -56,9 +56,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <div className="flex flex-row items-center gap-2">
                 <ScrollArea className="w-fit max-w-1/2 min-w-0 whitespace-nowrap">
                     <div className="flex flex-row items-stretch gap-3 py-2">
-                        {tags.map((tag) => (
+                        {tags.length > 0 ? tags.map((tag) => (
                             <TagChip key={tag.id} tag={tag} songId={songId} />
-                        ))}
+                        )) : <p className="text-sm">No tags added</p>}
                     </div>
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>
