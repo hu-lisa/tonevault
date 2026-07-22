@@ -1,5 +1,5 @@
 import SideNav from '@/components/dashboard/sidenav';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
  
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (

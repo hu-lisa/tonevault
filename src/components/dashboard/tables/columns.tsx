@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { SongWithTags } from '@/db/schema';
 import { ColumnDef } from '@tanstack/react-table';
-import Link from 'next/link';
 
 export const columns: ColumnDef<SongWithTags>[] = [
     {

@@ -1,15 +1,10 @@
 'use server'
 import { getSongsWithTags } from "@/app/actions/songs";
 import CreateForm from "@/components/dashboard/songs/createform";
-import SongTable from "@/components/dashboard/songs/songtable";
 import { columns } from "@/components/dashboard/tables/columns";
 import { DataTable } from "@/components/dashboard/tables/datatable";
 import { SongFilters } from "@/components/dashboard/tables/songfilters";
 import { SongPagination } from "@/components/dashboard/tables/songpagination";
-import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Song } from "@/db/schema";
 
 export default async function Page(props: {
     searchParams?: Promise<{

@@ -1,6 +1,5 @@
 'use client'
-import { useActionState } from 'react';
-import { redirect, useSearchParams } from 'next/navigation';
+
 import { signup } from '@/app/actions/signup';
 import * as z from "zod";
 import { zodResolver } from '@hookform/resolvers/zod';

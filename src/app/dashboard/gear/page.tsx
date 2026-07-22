@@ -1,4 +1,3 @@
-import { getUserId } from "@/app/actions/auth";
 import { getGearItems } from "@/app/actions/gear";
 import CreateForm from "@/components/dashboard/gear/createform";
 import GearCard from "@/components/dashboard/gear/gearcard";

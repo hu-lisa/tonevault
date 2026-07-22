@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from "@/db";
-import { NewSong, Song, SongFormValues, songs } from "@/db/schema";
+import { songs } from "@/db/schema";
 import { eq, and, sql, desc, ne, ilike } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getUserId } from "./auth";
@@ -133,7 +133,7 @@ export async function addSong(song: any) {
 }
 
 export async function updateSong(
-    fields: SongFormValues, 
+    fields: any, 
     id: number
 ) {
     const userId = await getUserId();
@@ -150,7 +150,13 @@ export async function updateSong(
         }
         await db
             .update(songs)
-            .set({ title: fields.title, artist: fields.artist, status: fields.status, sourceLink: fields.sourceLink})
+            .set({ 
+                title: fields.title, 
+                artist: fields.artist, 
+                status: fields.status, 
+                sourceLink: fields.sourceLink, 
+                lastPracticedAt: fields.lastPracticedAt,
+            })
             .where(and(eq(songs.userId, userId), eq(songs.id, id)));
         revalidatePath('/dashboard/songs');
         revalidatePath(`/dashboard/songs/${id}`);

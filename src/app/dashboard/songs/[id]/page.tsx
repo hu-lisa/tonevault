@@ -1,4 +1,3 @@
-import { getUserId } from "@/app/actions/auth";
 import { getLoadouts } from "@/app/actions/loadouts";
 import { getPresets } from "@/app/actions/presets";
 import { getSongById } from "@/app/actions/songs";
@@ -76,9 +75,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <header className="text-2xl">Presets</header>
                     <CreateForm songId={songId} loadouts={[{ id: null, name: 'Main' }, ...loadouts]}/>
                 </div>
-                {presets.map((p) => (
+                {presets.length > 0 ? presets.map((p) => (
                     <PresetCard key={p.id} preset={p} />
-                ))}
+                )) : <p className="text-sm text-center">No presets yet.</p>}
             </div>
         </div>
     )

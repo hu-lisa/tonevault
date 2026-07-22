@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey, index } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, varchar, boolean, primaryKey, index, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 
@@ -112,6 +112,7 @@ export const songs = pgTable("songs", {
     .$onUpdate(() => new Date()),
 }, (table) => [
   index().on(table.userId),
+  unique().on(table.userId, table.title, table.artist),
 ]);
 export type Song = typeof songs.$inferSelect;
 export type NewSong = typeof songs.$inferInsert;
@@ -181,6 +182,7 @@ export const presets = pgTable("presets", {
   index().on(table.songId),
   index().on(table.loadoutId),
   index().on(table.createdBy),
+  unique().on(table.userId, table.songId, table.loadoutId, table.name).nullsNotDistinct(),
 ]);
 export type Preset = typeof presets.$inferSelect;
 export type NewPreset = typeof presets.$inferInsert;

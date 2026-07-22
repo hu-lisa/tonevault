@@ -4,7 +4,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { GearItem, NewPresetSetting, Preset, PresetSetting } from '@/db/schema';
+import { GearItem, Preset, PresetSetting } from '@/db/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { GearSelectItem } from './gearselectitem';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { addSettings, presetExists, updatePreset } from '@/app/actions/presets';
+import { presetExists, updatePreset } from '@/app/actions/presets';
 import { PencilIcon } from 'lucide-react';
 
 const presetFormSchema = z.object({
@@ -49,19 +49,7 @@ export default function EditPresetForm({ preset, settings, loadoutItems }: {
     });
 
     async function onSubmit(data: z.infer<typeof presetFormSchema>) {
-        const addedPreset = await updatePreset(preset.id, preset.songId, data.name === "" ? "Main" : data.name);
-        if (addedPreset?.error) {
-            form.setError('root', {
-                type: 'manual',
-                message: addedPreset.error,
-            });
-            return;
-        }
-        const settings: NewPresetSetting[] = data.presetSettings.map((s) => ({
-            ...s,
-            presetId: preset.id,
-        }));
-        const result = await addSettings(settings);
+        const result = await updatePreset(preset.id, preset.songId, data.name === "" ? "Main" : data.name, data.presetSettings);
         if (result?.error) {
             form.setError('root', {
                 type: 'manual',

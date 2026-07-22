@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getUser, signIn } from './auth';
 import bcrypt from 'bcrypt';
 import { db } from '@/db';
-import { loadouts, users } from '@/db/schema';
+import { users } from '@/db/schema';
 import { AuthError } from 'next-auth';
 
 export async function signup({ email, password }: { email: string, password: string }) {

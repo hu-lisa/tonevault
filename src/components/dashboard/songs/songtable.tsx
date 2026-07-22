@@ -4,7 +4,6 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,

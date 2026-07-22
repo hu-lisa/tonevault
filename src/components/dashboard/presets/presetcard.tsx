@@ -4,12 +4,11 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Preset } from "@/db/schema";
 import { SettingsCard } from "./settingscard";
 import EditPresetForm from "./editpreset";
-import { getGearById, getGearItems } from "@/app/actions/gear";
+import { getGearItems } from "@/app/actions/gear";
 import DeletePresetDialog from "./deletepreset";
 
 export async function PresetCard({ preset }: { preset: Preset }) {
     const settings = await getSettings(preset.id);
-    console.log(preset.name);
     const loadoutItems = await getGearItems(preset.loadoutId);
     return (
         <Card className="w-full min-w-0 bg-transparent">

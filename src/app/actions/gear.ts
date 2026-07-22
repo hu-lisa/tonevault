@@ -1,8 +1,8 @@
 'use server'
 
 import { db } from "@/db"
-import { gearItems, loadoutItems, loadouts, NewGearItem } from "@/db/schema"
-import { and, asc, eq } from "drizzle-orm"
+import { gearItems, loadoutItems } from "@/db/schema"
+import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache";
 import { getUserId } from "./auth";
 
@@ -43,7 +43,7 @@ export async function addGear(newGear: any, loadoutId: number | null) {
         if (loadoutId) {
             await db.insert(loadoutItems).values({ loadoutId: loadoutId, gearItemId: gear[0].id });
         }
-        revalidatePath('/dashboard/gear')
+        revalidatePath('/dashboard/gear');
     } catch (error) {
         return { error: 'Something went wrong.' };
     }
@@ -54,7 +54,7 @@ export async function updateGear(fields: any, gearId: number) {
     try {
         await db
             .update(gearItems)
-            .set(fields)
+            .set({ name: fields.name, type: fields.type, notes: fields.notes })
             .where(and(eq(gearItems.userId, userId), eq(gearItems.id, gearId)));
         revalidatePath('/dashboard/gear');
     } catch (error) {

@@ -5,21 +5,21 @@ import DeleteButton from "./deleteform";
 
 export default function GearCard({ gear }: { gear: GearItem }) {
     return (
-        <Card>
+        <Card className="h-44">
             <CardHeader>
-                <CardTitle>{gear.name}</CardTitle>
+                <CardTitle className="truncate">{gear.name}</CardTitle>
                 <CardAction className="flex flex-row gap-2">
                     <EditForm gear={gear} />
                     <DeleteButton gearId={gear.id} />
                 </CardAction>
             </CardHeader>
-            <CardContent>
-                {gear.notes &&
-                    <div>
-                        <p>{gear.notes}</p>
-                    </div>
-                }
-            </CardContent>
+            {gear.notes &&
+                <CardContent>
+                    <p className="whitespace-pre-line text-sm text-muted-foreground line-clamp-4">
+                        {gear.notes}
+                    </p>
+                </CardContent>
+            }
         </Card>
     )
 }

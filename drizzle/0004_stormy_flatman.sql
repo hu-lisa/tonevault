@@ -1,0 +1,2 @@
+ALTER TABLE "presets" ADD CONSTRAINT "presets_userId_songId_loadoutId_name_unique" UNIQUE NULLS NOT DISTINCT("userId","songId","loadoutId","name");--> statement-breakpoint
+ALTER TABLE "songs" ADD CONSTRAINT "songs_userId_title_artist_unique" UNIQUE("userId","title","artist");

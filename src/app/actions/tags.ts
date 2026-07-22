@@ -1,10 +1,10 @@
 'use server'
 
-import { NewTag, songs, songTags, Tag, tags } from "@/db/schema";
+import { songs, songTags, Tag, tags } from "@/db/schema";
 import { getUserId } from "./auth";
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export async function updateTags(songId: number, selected: { id: number, name: string }[]) {
     //only DISPLAY tags in the form (available for user to select) that are not attached to song

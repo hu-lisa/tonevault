@@ -15,7 +15,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { SongPagination } from './songpagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SongWithTags } from '@/db/schema';
 
@@ -28,7 +27,6 @@ interface DataTableProps {
 export function DataTable({
     columns,
     data,
-    pageCount,
 }: DataTableProps) {
     const router = useRouter();
     const table = useReactTable<SongWithTags>({

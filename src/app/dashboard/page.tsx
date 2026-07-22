@@ -1,6 +1,5 @@
-import SongTable from "@/components/dashboard/songs/songtable";
 import SongCard from "@/components/dashboard/songs/songcard";
-import { getCurrentSongs, getSongsWithTags } from "../actions/songs";
+import { getSongsWithTags } from "../actions/songs";
 import { DataTable } from "@/components/dashboard/tables/datatable";
 import { columns } from "@/components/dashboard/tables/columns";
 import { SongPagination } from "@/components/dashboard/tables/songpagination";
