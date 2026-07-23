@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ToneVault",
+  title: "ToneBook",
   description: "A song tracker, gear management, and preset storage app for guitar players",
   keywords: "guitar preset tracker, pedal inventory, presets, amp settings"
 };

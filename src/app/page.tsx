@@ -10,7 +10,7 @@ export default async function Home() {
         <Card className="w-72 sm:max-w-sm gap-16">
           <CardHeader className="gap-2">
             <CardTitle className="text-center text-2xl">
-              ToneVault
+              ToneBook
             </CardTitle>
             <CardDescription className="text-center">
               Your one-stop for song tracking, gear management, and preset customization.
